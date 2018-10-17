@@ -5,17 +5,20 @@
 
 using namespace std;
 
+/// Program specific variables ///
+char incomingData[MAX_DATA_LENGTH];
 int serialBaud = 6.666666;
-
 string PCS_ver="0.0.0.1";
 string uname="";
 string passwd="";
 
-
-string title="Welcome to this Paradigm Communicator server.";
-
+/// User-end variables ///
+int sys_comNum=4;
+string msg_title="Welcome to this Paradigm Communicator server."; //Fetch, but have a default
+string msg_MOTD=""; //Fetch, no default
 char *port_name = "\\\\.\\COM4";
-char incomingData[MAX_DATA_LENGTH];
+
+/// System initialization ///
 SerialPort serial(port_name);
 
 
@@ -42,32 +45,19 @@ void serialPrint(string input){
     printf("\n");
     serial.writeSerialPort("\r\n",2);
 }
-void serialSpeed(int baud){
-    serialBaud = baud;
-}
 int query(string uname, string passwd){
     for(int i=0; i<passwd.size(); i++)printf("%02X", passwd[i]);
-
-if(uname == "admin" || uname == "admin\r\n"){
-    if(passwd == "password" || passwd == "password\r\n"){
-        return 0;
-    } else {
-        return 1;
-    }
-} else {
-    return 2;
-}
+	if(uname == "admin" || uname == "admin\r\n"){
+		if(passwd == "password" || passwd == "password\r\n"){
+			return 0;
+		} else {
+			return 1;
+		}
+	} else {
+		return 2;
+	}
 }
 string serialLine(int option){
-    /*
-    int c;
-    string out;
-    while (c != '\n') {
-        c=getchar();
-        ///putchar (c);
-        out += c;
-    } ;
-    */
     char* buf;
     *buf = NULL;
     bool shouldLoop = true;
@@ -98,9 +88,6 @@ string serialLine(int option){
         };
     }
     //cout<<out;
-
-
-
     return out;
 }
 
@@ -124,7 +111,7 @@ int main()
     serialPrint("Paradigm Communicator " + PCS_ver);
     serialPrint("The date is " + date());
     serialPrint("");
-    serialPrint(title);
+    serialPrint(msg_title);
     serialPrint("");
     login();
     return 0;
