@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1539695548 source:d:\paradigm\paradigmcom-server\main.cpp
+	<iostream>
+	<ctime>
+	<windows.h>
+	<Serial.h>
+
+1539682685 source:d:\paradigm\paradigmcom-server\src\serial.cpp
+	"Serial.h"
+
+1539682685 d:\paradigm\paradigmcom-server\include\serial.h
+	<windows.h>
+	<stdio.h>
+	<stdlib.h>
+
