@@ -2,21 +2,26 @@
 #include <ctime>
 #include <windows.h>
 #include <Serial.h>
+#include <fstream>
+#include <unistd.h>
 
 using namespace std;
 
 /// Program specific variables ///
 char incomingData[MAX_DATA_LENGTH];
 int serialBaud = 6.666666;
-string PCS_ver="0.0.0.1";
+string PCS_ver="0.1.0 A";
 string uname="";
 string passwd="";
+bool uname_good=false;
+bool passwd_good=false;
 
 /// User-end variables ///
 int sys_comNum=4;
 string msg_title="Welcome to this Paradigm Communicator server."; //Fetch, but have a default
 string msg_MOTD=""; //Fetch, no default
 char *port_name = "\\\\.\\COM4";
+string msg_welcome="Welcome, ";
 
 /// System initialization ///
 SerialPort serial(port_name);
@@ -27,6 +32,37 @@ string date(){
     time_t now = time(0);
     char* dt = ctime(&now);
     return dt;
+}
+
+string setting_read(string setting, string path){
+    string line;
+    ifstream file;
+    char pBuf[256]; size_t len = sizeof(pBuf);
+    GetModuleFileName(NULL, pBuf, len);
+    cout<<"Opening file "<<path<<" from "<<pBuf<<endl;
+    file.open("\\users.txt");
+    if (file.is_open())
+	{
+        for(int i = 0; file.good(); i++)
+        {
+            getline(file, line);
+            string fetched_setting, var;
+            setting = line.substr(0, line.find("=", 0));
+            var = line.substr(line.find("=", 0)+1,line.size());
+            if(fetched_setting==setting){
+                    cout<<"Setting found! Setting: "<<setting<<" with value "<<var<<endl;
+                return var;
+                break;
+            } else {
+                cout<<"setting "<<setting<<" Not Found"<<endl;
+                return "NOT_FOUND";
+            }
+        }
+	} else {
+	    cout<<"Couldn't open file "<<path<<", "<<strerror(errno)<<endl;
+        return "FILE_NOT_FOUND";
+	}
+    file.close();
 }
 
 void serialWrite(string input){
@@ -46,9 +82,25 @@ void serialPrint(string input){
     serial.writeSerialPort("\r\n",2);
 }
 int query(string uname, string passwd){
+    uname_good=false;
+    passwd_good=false;
     for(int i=0; i<passwd.size(); i++)printf("%02X", passwd[i]);
-	if(uname == "admin" || uname == "admin\r\n"){
-		if(passwd == "password" || passwd == "password\r\n"){
+	if(uname == "falken" || uname == "admin"){
+        uname_good = true;
+		if(passwd == "joshua" || passwd == "password"){
+                passwd_good = true;
+                if(uname=="falken")msg_welcome = "Greetings, professor ";
+		}
+	}
+    if(setting_read(uname, "users.txt")!="NOT_FOUND"){
+        uname_good=true;
+        if(setting_read(uname, "users.txt")==passwd){
+            passwd_good=true;
+        }
+    }
+
+    if(uname_good){
+        if(passwd_good){
 			return 0;
 		} else {
 			return 1;
@@ -92,6 +144,7 @@ string serialLine(int option){
 }
 
 int login(){
+    setting_read(uname, "ass");
     serialWrite("Username: ");
     uname=serialLine(0);
     serialWrite("Password: ");
@@ -99,7 +152,7 @@ int login(){
     serialWrite("\n");
 
     switch(query(uname, passwd)){
-    case 0: serialPrint("Welcome, " + uname); break;
+    case 0: serialPrint(msg_welcome + uname); break;
     case 1: serialPrint("Wrong password"); login(); break;
     case 2: serialPrint("Wrong username"); login(); break;
     default: serialPrint("Unexpected Error"); login(); break;
