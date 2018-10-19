@@ -66,10 +66,12 @@ void writeData(string str) {
     write( USB, &cmd, sizeof(cmd));
 }
 
-void giveUserResponse(char replacement, char buf) {
+void giveUserResponse(char replacement, char buf, int spot) {
     // some special cases
     switch(buf) {
         case '\x08':    // backspace
+            if (spot < 1)
+                break;
             writeData((string)"\x08\x20\x08"); // write backspace, replace character with space and set cursor back one position
             break;
         case '\0':      // skip null bytes
@@ -94,11 +96,13 @@ string readData(char replacement) {
     do {
         n = read( USB, &buf, 1 );
         sprintf( &response[spot], "%c", buf );
-        giveUserResponse(replacement, buf);
+        giveUserResponse(replacement, buf, spot);
         if (buf == '\x08') {
-            sprintf( &response[spot], "%c", '\0' );
-            spot -= n;
-            sprintf( &response[spot], "%c", '\0' );
+            if (spot > 0) {
+                sprintf( &response[spot], "%c", '\0' );
+                spot -= n;
+                sprintf( &response[spot], "%c", '\0' );
+            }
         } else {
             spot += n;
         }
