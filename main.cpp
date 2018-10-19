@@ -33,33 +33,37 @@ string date(){
     char* dt = ctime(&now);
     return dt;
 }
+string getPath() {
+    char buffer[MAX_PATH];
+    GetModuleFileName( NULL, buffer, MAX_PATH );
+    string::size_type pos = string( buffer ).find_last_of( "\\/" );
+    return string( buffer ).substr( 0, pos+1);
+}
 
 string setting_read(string setting, string path){
     string line;
     ifstream file;
-    char pBuf[256]; size_t len = sizeof(pBuf);
-    GetModuleFileName(NULL, pBuf, len);
-    cout<<"Opening file "<<path<<" from "<<pBuf<<endl;
-    file.open("\\users.txt");
+    cout<<"Opening file "<<path<<" from "<<getPath()<<endl;
+    string fullPath = getPath() + path;
+    string fetched_setting, var;
+    file.open(fullPath);
     if (file.is_open())
 	{
         for(int i = 0; file.good(); i++)
         {
             getline(file, line);
-            string fetched_setting, var;
-            setting = line.substr(0, line.find("=", 0));
+            fetched_setting = line.substr(0, line.find("=", 0));
             var = line.substr(line.find("=", 0)+1,line.size());
             if(fetched_setting==setting){
-                    cout<<"Setting found! Setting: "<<setting<<" with value "<<var<<endl;
+                    //cout<<"Setting found! Setting: "<<setting<<" with value "<<var<<endl;
                 return var;
                 break;
-            } else {
-                cout<<"setting "<<setting<<" Not Found"<<endl;
-                return "NOT_FOUND";
             }
         }
+        //cout<<"Setting "<<setting<<" Not Found"<<endl;
+        return "NOT_FOUND";
 	} else {
-	    cout<<"Couldn't open file "<<path<<", "<<strerror(errno)<<endl;
+	    cout<<"ERROR: Couldn't open file "<<fullPath<<", "<<strerror(errno)<<endl;
         return "FILE_NOT_FOUND";
 	}
     file.close();
@@ -92,9 +96,9 @@ int query(string uname, string passwd){
                 if(uname=="falken")msg_welcome = "Greetings, professor ";
 		}
 	}
-    if(setting_read(uname, "users.txt")!="NOT_FOUND"){
+    if(setting_read(uname, "\\Settings\\users.txt")!="NOT_FOUND"){
         uname_good=true;
-        if(setting_read(uname, "users.txt")==passwd){
+        if(setting_read(uname, "\\Settings\\users.txt")==passwd){
             passwd_good=true;
         }
     }
@@ -144,7 +148,6 @@ string serialLine(int option){
 }
 
 int login(){
-    setting_read(uname, "ass");
     serialWrite("Username: ");
     uname=serialLine(0);
     serialWrite("Password: ");
