@@ -135,7 +135,8 @@ string readData(bool shouldReplace, char replacement) {
             spot += n;
         }
     } while( !(buf == '\r' || buf == '\n' || buf == '\0') && n > 0 && spot < maxSize);
-
+    if (buf == '\r' || buf == '\n' || buf == '\0')
+        sprintf( &response[spot], "%c", '\0' );
     if (n < 0) {
         // Some error occured
         return (string)"ERROR!!!";
