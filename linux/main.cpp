@@ -151,7 +151,7 @@ void STDInToSerial (bool* shouldStop) {
         char buf = '\0';
         read(0, &buf, 1);
         if ((char)buf == (char)'\r' || (char)buf == (char)'\n')
-            break;
+            continue;
         //usleep(timeout);
         writeData((string)&buf);
     }
