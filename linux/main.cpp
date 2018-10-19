@@ -66,7 +66,9 @@ void writeData(string str) {
     write( USB, &cmd, sizeof(cmd));
 }
 
-void giveUserResponse(char replacement, char buf, int spot) {
+void giveUserResponse(bool shouldReplace, char replacement, char buf, int spot) {
+    // if there's no replacement and we should replace, do not output anything
+    if (shouldReplace && !replacement) return;
     // some special cases
     switch(buf) {
         case '\x08':    // backspace
@@ -79,12 +81,15 @@ void giveUserResponse(char replacement, char buf, int spot) {
         case '\n':      // newline
             break;
         default:        // any ordinary byte write (possibly encoded to replacement)
-            if (replacement) { writeData(string(1, replacement)); }
-                else { writeData(string(1, buf)); };
+            if (shouldReplace) {
+                writeData(string(1, replacement));
+            } else {
+                writeData(string(1, buf));
+            }
     };
 }
 
-string readData(char replacement) {
+string readData(bool shouldReplace, char replacement) {
     int n = 0,
     spot = 0,
     maxSize = 255;
@@ -96,7 +101,7 @@ string readData(char replacement) {
     do {
         n = read( USB, &buf, 1 );
         sprintf( &response[spot], "%c", buf );
-        giveUserResponse(replacement, buf, spot);
+        giveUserResponse(shouldReplace, replacement, buf, spot);
         if (buf == '\x08') {
             if (spot > 0) {
                 sprintf( &response[spot], "%c", '\0' );
@@ -135,12 +140,12 @@ void login() {
     writeData((string)"Welcome to Paradigm Communicator!");
     writeData(newLine);
     writeData((string)"Username: ");
-    string str = readData(NULL); // stop bitching about this little thing, it works, shut up already
-    cout << "User provided: " << str << endl;
+    string username = readData(false, '\0'); // stop bitching about this little thing, it works, shut up already
+    cout << "User provided: " << username << endl;
     writeData(newLine);
     writeData((string)"Password: ");
-    str = readData('*');
-    cout << "User provided: " << str << endl;
+    string password = readData(true, NULL);
+    cout << "User provided: " << password << endl;
 }
 
 void runProgram() {
