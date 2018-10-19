@@ -70,7 +70,7 @@ void giveUserResponse(char replacement, char buf) {
     // some special cases
     switch(buf) {
         case '\x08':    // backspace
-            writeData(string(1, buf)); // write the data directly, do not replace it
+            writeData((string)"\x08\x20\x08"); // write backspace, replace character with space and set cursor back one position
             break;
         case '\0':      // skip null bytes
         case '\r':      // cariage return
@@ -95,7 +95,13 @@ string readData(char replacement) {
         n = read( USB, &buf, 1 );
         sprintf( &response[spot], "%c", buf );
         giveUserResponse(replacement, buf);
-        spot += n;
+        if (buf == '\x08') {
+            sprintf( &response[spot], "%c", '\0' );
+            spot -= n;
+            sprintf( &response[spot], "%c", '\0' );
+        } else {
+            spot += n;
+        }
     } while( !(buf == '\r' || buf == '\n' || buf == '\0') && n > 0 && spot < maxSize);
 
     if (n < 0) {
