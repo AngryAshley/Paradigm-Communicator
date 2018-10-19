@@ -12,6 +12,7 @@ using namespace std;
 
 int timeout = 250000;
 int USB;
+string newLine = "\r";
 string readText;
 
 void initConnection() {
@@ -65,6 +66,22 @@ void writeData(string str) {
     write( USB, &cmd, sizeof(cmd));
 }
 
+void giveUserResponse(char replacement, char buf) {
+    // some special cases
+    switch(buf) {
+        case '\x08':    // backspace
+            writeData(string(1, buf)); // write the data directly, do not replace it
+            break;
+        case '\0':      // skip null bytes
+        case '\r':      // cariage return
+        case '\n':      // newline
+            break;
+        default:        // any ordinary byte write (possibly encoded to replacement)
+            if (replacement) { writeData(string(1, replacement)); }
+                else { writeData(string(1, buf)); };
+    };
+}
+
 string readData(char replacement) {
     int n = 0,
     spot = 0,
@@ -77,8 +94,7 @@ string readData(char replacement) {
     do {
         n = read( USB, &buf, 1 );
         sprintf( &response[spot], "%c", buf );
-        if (replacement) { writeData(string(1, replacement)); }
-            else { writeData(string(1, buf)); };
+        giveUserResponse(replacement, buf);
         spot += n;
     } while( !(buf == '\r' || buf == '\n' || buf == '\0') && n > 0 && spot < maxSize);
 
@@ -92,32 +108,44 @@ string readData(char replacement) {
     return (string)response;
 }
 
-void STDInToSerial () {
-    do {
+void STDInToSerial (bool* shouldStop) {
+    while (!*shouldStop) {
         char buf = '\0';
         read(0, &buf, 1);
         if ((char)buf == (char)'\r' || (char)buf == (char)'\n')
             break;
         usleep(timeout);
         writeData((string)&buf);
-    } while (true);
+    }
 }
 
 void readConfig () {}
 
-void runProgram() {
+void login() {
+    writeData((string)"Welcome to Paradigm Communicator!");
+    writeData(newLine);
     writeData((string)"Username: ");
-    string str = readData(NULL);
-    cout << str << endl;
+    string str = readData(NULL); // stop bitching about this little thing, it works, shut up already
+    cout << "User provided: " << str << endl;
+    writeData(newLine);
+    writeData((string)"Password: ");
+    str = readData('*');
+    cout << "User provided: " << str << endl;
+}
+
+void runProgram() {
+    login();
 }
 
 int main() {
     initConnection();
     readConfig();
+    bool shouldStop = false;
     thread x(runProgram);
-    thread y(STDInToSerial);
+    thread y(STDInToSerial, &shouldStop);
 
     x.join();
+    shouldStop = true;
     y.join();
     return 0;
 }
