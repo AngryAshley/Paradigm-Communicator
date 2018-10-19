@@ -159,20 +159,33 @@ void STDInToSerial (bool* shouldStop) {
 
 void readConfig () {}
 
-void login() {
+bool checkLogin(string username, string password) {
+    if (username == (string)"dan" && password == (string)"pass")
+        return true;
+    return false;
+}
+
+bool login() {
     writeData((string)"Welcome to Paradigm Communicator!");
     writeData(newLine);
     writeData((string)"Username: ");
     string username = readData(false, '\0');
-    cout << "User provided: " << username << endl;
+    hexdump(username); //cout <<  username << endl;
     writeData(newLine);
     writeData((string)"Password: ");
     string password = readData(true, NULL); // stop bitching about this little thing, it works, shut up already
-    cout << "User provided: " << password << endl;
+    hexdump(password); //cout << password << endl;
+    return checkLogin(username, password);
+}
+
+void welcome() {
+    writeData((string)"Welcome user!");
+    writeData(newLine);
 }
 
 void runProgram() {
-    login();
+    if (login())
+        welcome();
 }
 
 int main() {
