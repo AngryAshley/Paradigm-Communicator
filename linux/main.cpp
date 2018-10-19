@@ -140,11 +140,11 @@ void login() {
     writeData((string)"Welcome to Paradigm Communicator!");
     writeData(newLine);
     writeData((string)"Username: ");
-    string username = readData(false, '\0'); // stop bitching about this little thing, it works, shut up already
+    string username = readData(false, '\0');
     cout << "User provided: " << username << endl;
     writeData(newLine);
     writeData((string)"Password: ");
-    string password = readData(true, NULL);
+    string password = readData(true, NULL); // stop bitching about this little thing, it works, shut up already
     cout << "User provided: " << password << endl;
 }
 
