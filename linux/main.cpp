@@ -10,7 +10,7 @@
 
 using namespace std;
 
-int timeout = 250000;
+int timeout = 50000;
 int USB;
 string newLine = "\r";
 string readText;
@@ -60,10 +60,18 @@ void initConnection() {
     }
 }
 
-void writeData(string str) {
+void writeData(string str, bool isInstant) {
     char cmd[str.size() + 1];
     strcpy(cmd, str.c_str());
-    write( USB, &cmd, sizeof(cmd));
+    for (long unsigned int i = 0; i < str.size(); i++) {
+        write( USB, &cmd[i], 1);
+        if (!isInstant)
+            usleep(timeout);
+    }
+}
+
+void writeData(string str) {
+    writeData(str, false);
 }
 
 void giveUserResponse(bool shouldReplace, char replacement, char buf, int spot) {
@@ -74,7 +82,7 @@ void giveUserResponse(bool shouldReplace, char replacement, char buf, int spot) 
         case '\x08':    // backspace
             if (spot < 1)
                 break;
-            writeData((string)"\x08\x20\x08"); // write backspace, replace character with space and set cursor back one position
+            writeData((string)"\x08\x20\x08", true); // write backspace, replace character with space and set cursor back one position
             break;
         case '\0':      // skip null bytes
         case '\r':      // cariage return
@@ -82,9 +90,9 @@ void giveUserResponse(bool shouldReplace, char replacement, char buf, int spot) 
             break;
         default:        // any ordinary byte write (possibly encoded to replacement)
             if (shouldReplace) {
-                writeData(string(1, replacement));
+                writeData(string(1, replacement), true);
             } else {
-                writeData(string(1, buf));
+                writeData(string(1, buf), true);
             }
     };
 }
@@ -129,7 +137,7 @@ void STDInToSerial (bool* shouldStop) {
         read(0, &buf, 1);
         if ((char)buf == (char)'\r' || (char)buf == (char)'\n')
             break;
-        usleep(timeout);
+        //usleep(timeout);
         writeData((string)&buf);
     }
 }
