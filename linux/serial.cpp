@@ -70,7 +70,7 @@ void Serial::writeData(string str) {
 }
 void Serial::giveUserResponse(bool shouldReplace, char replacement, char buf, int spot) {
     // if there's no replacement and we should replace, do not output anything
-    if (shouldReplace && !replacement) return;
+    if (shouldReplace && replacement == '\0') return;
     // some special cases
     switch(buf) {
         case '\x08':    // backspace

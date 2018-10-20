@@ -56,7 +56,7 @@ bool login() {
     hexdump(username); //cout <<  username << endl;
     serialConection->writeData(newLine);
     serialConection->writeData((string)"Password: ");
-    string password = serialConection->readData(true, NULL); // stop bitching about this little thing, it works, shut up already
+    string password = serialConection->readData(true, '\0'); // stop bitching about this little thing, it works, shut up already
     serialConection->writeData(newLine);
     hexdump(password); //cout << password << endl;
     return checkLogin(username, password);
