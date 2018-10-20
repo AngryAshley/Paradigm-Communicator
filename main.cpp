@@ -11,10 +11,7 @@ using namespace std;
 char incomingData[MAX_DATA_LENGTH];
 int serialBaud = 6.666666;
 string PCS_ver="0.1.0 A";
-string uname="";
-string passwd="";
-bool uname_good=false;
-bool passwd_good=false;
+string path_exe="";
 
 /// User-end variables ///
 int sys_comNum=4;
@@ -23,9 +20,14 @@ string msg_MOTD=""; //Fetch, no default
 char *port_name = "\\\\.\\COM4";
 string msg_welcome="Welcome, ";
 
-/// System initialization ///
-SerialPort serial(port_name);
+/// Session Variables ///
+string uname="";
+string passwd="";
+bool uname_good=false;
+bool passwd_good=false;
 
+/// System initialization ///
+SerialPort serial;
 
 
 string date(){
@@ -33,18 +35,18 @@ string date(){
     char* dt = ctime(&now);
     return dt;
 }
-string getPath() {
-    char buffer[MAX_PATH];
-    GetModuleFileName( NULL, buffer, MAX_PATH );
-    string::size_type pos = string( buffer ).find_last_of( "\\/" );
-    return string( buffer ).substr( 0, pos+1);
+void getPath() {
+char path_exe_temp[1024];
+GetModuleFileName(NULL, path_exe_temp, 1024);
+int pos=string(path_exe_temp).find_last_of("\\/");
+path_exe=string(path_exe_temp).substr( 0, pos+1);
 }
 
 string setting_read(string setting, string path){
     string line;
     ifstream file;
-    cout<<"Opening file "<<path<<" from "<<getPath()<<endl;
-    string fullPath = getPath() + path;
+    //cout<<"Opening file "<<path<<" from "<<path_exe<<endl;
+    string fullPath = path_exe + path;
     string fetched_setting, var;
     file.open(fullPath);
     if (file.is_open())
@@ -147,6 +149,16 @@ string serialLine(int option){
     return out;
 }
 
+void loadSettings(){
+    if(setting_read("msg_title", "\\Settings\\settings.txt")!="*"){
+        msg_title=setting_read("msg_title", "\\Settings\\settings.txt");
+    }
+    msg_MOTD=setting_read("msg_MOTD", " \\Settings\\settings.txt");
+    string tempPort_name = setting_read("ser_port", "\\Settings\\settings.txt");
+    port_name= const_cast<char*>(tempPort_name.c_str());
+
+};
+
 int login(){
     serialWrite("Username: ");
     uname=serialLine(0);
@@ -164,6 +176,10 @@ int login(){
 
 int main()
 {
+    //loadSettings();
+    cout<<"Establishing a connection with "<<port_name<<endl;
+    serial.connect(port_name);
+    getPath();
     serialPrint("Paradigm Communicator " + PCS_ver);
     serialPrint("The date is " + date());
     serialPrint("");
