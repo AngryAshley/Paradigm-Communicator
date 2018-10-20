@@ -30,19 +30,26 @@ void hexdump(string str) {
 }
 
 void STDInToSerial (bool* shouldStop) {
+    // parse a boolean POINTER to stop outside thread scope
     while (!*shouldStop) {
+        // reset buffer to null byte
         char buf = '\0';
-        //read(0, &buf, 1);
+        // define a new filedescriptor set
         fd_set set;
+        // set some params
         FD_ZERO(&set);
         FD_SET(0, &set);
+        // define timeout
         struct timeval timeout;
+        // set some params
         timeout.tv_sec = 0;
         timeout.tv_usec = 10000;
+        // use select() to check if there's data to read
         int rv = select(1, &set, NULL, NULL, &timeout);
+        // if data, read it, else loop
         if (rv > 0)
             read(0, &buf, 1);
-        if ((char)buf == (char)'\r' || (char)buf == (char)'\n')
+        if ((char)buf == (char)'\r' || (char)buf == (char)'\n' || (char)buf == (char)'\0')
             continue;
         serialConection->writeData((string)&buf);
     }
