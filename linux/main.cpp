@@ -1,100 +1,203 @@
-#include <iostream>
-#include <string.h>
+#include <stdio.h>      // standard input / output functions
 #include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <termios.h>
+#include <string.h>     // string function definitions
+#include <unistd.h>     // UNIX standard function definitions
+#include <fcntl.h>      // File control definitions
+#include <errno.h>      // Error number definitions
+#include <termios.h>    // POSIX terminal control definitions
+#include <iostream>
+#include <thread>
 
 using namespace std;
 
-struct termios tio;
-struct termios stdio;
-struct termios old_stdio;
+int timeout = 50000;
+int USB;
+string newLine = "\r";
+string readText;
 
-int tty_fd;
+void initConnection() {
+    // open the USB connection `file`
+    USB = open( "/dev/pts/2", O_RDWR| O_NOCTTY );
+    // set the baud speed
+    speed_t baudSpeed = B9600;
 
-void initConnection (char* DEVICE_NAME) {
-    // partly: https://en.wikibooks.org/wiki/Serial_Programming/Serial_Linux#termios
-    tcgetattr(STDOUT_FILENO,&old_stdio);
+    // define a couple new variables
+    struct termios tty;
+    struct termios tty_old;
+    // fill memory with 0s
+    memset (&tty, 0, sizeof tty);
 
-    memset(&stdio,0,sizeof(stdio));
-    stdio.c_iflag=0;
-    stdio.c_oflag=0;
-    stdio.c_cflag=0;
-    stdio.c_lflag=0;
-    stdio.c_cc[VMIN]=1;
-    stdio.c_cc[VTIME]=0;
-    tcsetattr(STDOUT_FILENO,TCSANOW,&stdio);
-    tcsetattr(STDOUT_FILENO,TCSAFLUSH,&stdio);
-    fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);       // make the reads non-blocking
-
-    memset(&tio,0,sizeof(tio));
-    tio.c_iflag=0;
-    tio.c_oflag=0;
-    tio.c_cflag=CS8|CREAD|CLOCAL;           // 8n1, see termios.h for more information
-    tio.c_lflag=0;
-    tio.c_cc[VMIN]=1;
-    tio.c_cc[VTIME]=5;
-
-    tty_fd=open(DEVICE_NAME, O_RDWR | O_NONBLOCK);
-    cfsetospeed(&tio,B9600);            // 9600 baud
-    cfsetispeed(&tio,B9600);            // 9600 baud
-
-    tcsetattr(tty_fd,TCSANOW,&tio);
-}
-
-void closeConnection() {
-    close(tty_fd);
-    tcsetattr(STDOUT_FILENO,TCSANOW,&old_stdio);
-}
-
-void sendData(char* data, int bytes) {
-    int spot = 0;
-    do {
-        write(tty_fd,&data[spot],1);
-        spot++;
-    } while (spot < bytes);
-}
-
-void sendData(char* data) {
-    sendData(data, (unsigned)strlen(data));
-}
-
-void readData(char* buf, int amount) {
-    int charRead = 0;
-    char c;
-    do {
-        if (read(tty_fd, &c, 1) > 0) { // check if data was sent
-            strcat(buf, &c); // concat to buffer
-            charRead++;
-        }
-    } while (charRead < amount);
-}
-
-void readDataUntil(char* buf, char endCharacter, unsigned int maximum) {
-    do {
-        readData(buf, 1);
-    } while(buf[strlen(buf)-1] != endCharacter && strlen(buf) < maximum);
-}
-
-int main () {
-    initConnection((char*)"/dev/pts/2");
-    char* buf = new char[255];
-    sendData((char*)"\r\nUsername: ");
-    readDataUntil(buf, (char)'\x0d', 50);
-    if ((string)buf == "user\r") {
-        buf = new char[255];
-        sendData((char*)"\r\nPassword: ");
-        readDataUntil(buf, (char)'\x0d', 50);
-        if ((string)buf == "password\r") {
-            cout << "Success" << endl;
-        } else {
-            cout << "Fail" << endl;
-        }
-    } else {
-        cout << "Fail" << endl;
+    // error handling
+    if ( tcgetattr ( USB, &tty ) != 0 ) {
+       cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << endl;
     }
-    closeConnection();
-    return 1;
+
+    // save old tty parameters
+    tty_old = tty;
+
+    // set Baud Rate
+    cfsetospeed (&tty, baudSpeed);
+    cfsetispeed (&tty, baudSpeed);
+
+    // setting other port stuff
+    tty.c_cflag     &=  ~PARENB;            // Make 8n1
+    tty.c_cflag     &=  ~CSTOPB;
+    tty.c_cflag     &=  ~CSIZE;
+    tty.c_cflag     |=  CS8;
+
+    tty.c_cflag     &=  ~CRTSCTS;           // no flow control
+    tty.c_cc[VMIN]   =  1;                  // read doesn't block
+    tty.c_cc[VTIME]  =  5;                  // 0.5 seconds read timeout
+    tty.c_cflag     |=  CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
+
+    // make raw
+    cfmakeraw(&tty);
+
+    // flush port, then applies attributes
+    tcflush( USB, TCIFLUSH );
+    if ( tcsetattr ( USB, TCSANOW, &tty ) != 0) {
+       std::cout << "Error " << errno << " from tcsetattr" << std::endl;
+    }
+}
+
+void hexdump(string str) {
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = str.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i)
+    {
+        const unsigned char c = str[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    cout << output << endl;
+}
+
+void writeData(string str, bool isInstant) {
+    char cmd[str.size() + 1];
+    strcpy(cmd, str.c_str());
+    for (long unsigned int i = 0; i < str.size(); i++) {
+        write( USB, &cmd[i], 1);
+        if (!isInstant)
+            usleep(timeout);
+    }
+}
+
+void writeData(string str) {
+    writeData(str, false);
+}
+
+void giveUserResponse(bool shouldReplace, char replacement, char buf, int spot) {
+    // if there's no replacement and we should replace, do not output anything
+    if (shouldReplace && !replacement) return;
+    // some special cases
+    switch(buf) {
+        case '\x08':    // backspace
+            if (spot < 1)
+                break;
+            writeData((string)"\x08\x20\x08", true); // write backspace, replace character with space and set cursor back one position
+            break;
+        case '\0':      // skip null bytes
+        case '\r':      // cariage return
+        case '\n':      // newline
+            break;
+        default:        // any ordinary byte write (possibly encoded to replacement)
+            if (shouldReplace) {
+                writeData(string(1, replacement), true);
+            } else {
+                writeData(string(1, buf), true);
+            }
+    };
+}
+
+string readData(bool shouldReplace, char replacement) {
+    int n = 0,
+    spot = 0,
+    maxSize = 255;
+    char buf = '\0';
+
+    char response[maxSize];
+    memset(response, '\0', sizeof response);
+
+    do {
+        n = read( USB, &buf, 1 );
+        sprintf( &response[spot], "%c", buf );
+        giveUserResponse(shouldReplace, replacement, buf, spot);
+        if (buf == '\x08') {
+            if (spot > 0) {
+                sprintf( &response[spot], "%c", '\0' );
+                spot -= n;
+                sprintf( &response[spot], "%c", '\0' );
+            }
+        } else {
+            spot += n;
+        }
+    } while( !(buf == '\r' || buf == '\n' || buf == '\0') && n > 0 && spot < maxSize);
+    if (buf == '\r' || buf == '\n' || buf == '\0')
+        sprintf( &response[spot], "%c", '\0' );
+    if (n < 0) {
+        // Some error occured
+        return (string)"ERROR!!!";
+    }
+    else if (n == 0) {
+        return (string)"";
+    }
+    return (string)response;
+}
+
+void STDInToSerial (bool* shouldStop) {
+    while (!*shouldStop) {
+        char buf = '\0';
+        read(0, &buf, 1);
+        if ((char)buf == (char)'\r' || (char)buf == (char)'\n')
+            continue;
+        //usleep(timeout);
+        writeData((string)&buf);
+    }
+}
+
+void readConfig () {}
+
+bool checkLogin(string username, string password) {
+    if (username == (string)"dan" && password == (string)"pass")
+        return true;
+    return false;
+}
+
+bool login() {
+    writeData((string)"Welcome to Paradigm Communicator!");
+    writeData(newLine);
+    writeData((string)"Username: ");
+    string username = readData(false, '\0');
+    hexdump(username); //cout <<  username << endl;
+    writeData(newLine);
+    writeData((string)"Password: ");
+    string password = readData(true, NULL); // stop bitching about this little thing, it works, shut up already
+    hexdump(password); //cout << password << endl;
+    return checkLogin(username, password);
+}
+
+void welcome() {
+    writeData((string)"Welcome user!");
+    writeData(newLine);
+}
+
+void runProgram() {
+    if (login())
+        welcome();
+}
+
+int main() {
+    initConnection();
+    readConfig();
+    bool shouldStop = false;
+    thread x(runProgram);
+    thread y(STDInToSerial, &shouldStop);
+
+    x.join();
+    shouldStop = true;
+    y.join();
+    return 0;
 }
