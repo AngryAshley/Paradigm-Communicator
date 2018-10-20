@@ -88,15 +88,25 @@ void runProgram() {
 }
 
 int main() {
+    // make a new Serial object
     serialConection = new Serial();
+    // initialize the connection
     serialConection->initConnection();
+    // read config (nothing right now)
     readConfig();
+    // set shouldStop (for the loops in threads)
     bool shouldStop = false;
+    // start program thread
     thread x(runProgram);
+    // start STDIN reading thread, with the shouldStop var
     thread y(STDInToSerial, &shouldStop);
 
+    // wait for main program to finish
     x.join();
+    // set the shouldStop var to true, stops other threads
     shouldStop = true;
+    // wait for other threads to stop
     y.join();
+    // return no error
     return 0;
 }
