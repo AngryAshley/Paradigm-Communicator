@@ -32,10 +32,18 @@ void hexdump(string str) {
 void STDInToSerial (bool* shouldStop) {
     while (!*shouldStop) {
         char buf = '\0';
-        read(0, &buf, 1);
+        //read(0, &buf, 1);
+        fd_set set;
+        FD_ZERO(&set);
+        FD_SET(0, &set);
+        struct timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 10000;
+        int rv = select(1, &set, NULL, NULL, &timeout);
+        if (rv > 0)
+            read(0, &buf, 1);
         if ((char)buf == (char)'\r' || (char)buf == (char)'\n')
             continue;
-        //usleep(timeout);
         serialConection->writeData((string)&buf);
     }
 }
