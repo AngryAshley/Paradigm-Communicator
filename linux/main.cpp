@@ -168,7 +168,7 @@ void STDInToSerial (bool* shouldStop) {
 void readConfig () {}
 
 bool checkLogin(string username, string password) {
-    if (username == (string)"dan" && password == (string)"pass")
+    if (username == (string)"dan\r" && password == (string)"pass\r")
         return true;
     return false;
 }
@@ -182,6 +182,7 @@ bool login() {
     serialConection->writeData(newLine);
     serialConection->writeData((string)"Password: ");
     string password = serialConection->readData(true, NULL); // stop bitching about this little thing, it works, shut up already
+    serialConection->writeData(newLine);
     hexdump(password); //cout << password << endl;
     return checkLogin(username, password);
 }
