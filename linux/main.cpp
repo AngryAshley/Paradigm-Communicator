@@ -11,6 +11,7 @@
 
 using namespace std;
 
+string PCS_ver="0.1.0 A";
 string newLine = "\r";
 Serial* serialConection;
 
@@ -64,16 +65,12 @@ bool checkLogin(string username, string password) {
 }
 
 bool login() {
-    serialConection->writeData((string)"Welcome to Paradigm Communicator!");
-    serialConection->writeData(newLine);
     serialConection->writeData((string)"Username: ");
     string username = serialConection->readData(false, '\0');
-    hexdump(username); //cout <<  username << endl;
     serialConection->writeData(newLine);
     serialConection->writeData((string)"Password: ");
     string password = serialConection->readData(true, '\0'); // stop bitching about this little thing, it works, shut up already
     serialConection->writeData(newLine);
-    hexdump(password); //cout << password << endl;
     return checkLogin(username, password);
 }
 
@@ -83,6 +80,8 @@ void welcome() {
 }
 
 void runProgram() {
+    serialConection->writeData("Paradigm Communicator " + PCS_ver);
+    serialConection->writeData(newLine);
     if (login())
         welcome();
 }
