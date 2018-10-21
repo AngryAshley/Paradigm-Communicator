@@ -9,7 +9,8 @@
 
 using namespace std;
 
-Serial::Serial(const char* device) {
+Serial::Serial(const char* dev) {
+    device = dev;
     timeout = 50000;
     // open the USB connection `file`
     USB = open( device, O_RDWR| O_NOCTTY );
@@ -53,6 +54,9 @@ Serial::Serial(const char* device) {
     if ( tcsetattr ( USB, TCSANOW, &tty ) != 0) {
        std::cout << "Error " << errno << " from tcsetattr" << std::endl;
     }
+}
+Serial::~Serial() {
+    cout << "Closing connection to " << device << endl;
 }
 void Serial::writeData(string str, bool isInstant) {
     char cmd[str.size() + 1];

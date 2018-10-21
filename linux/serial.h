@@ -6,8 +6,10 @@ class Serial {
 private:
     int timeout;
     int USB;
+    const char* device;
 public:
     Serial(const char* device);
+    ~Serial();
     void writeData(std::string str, bool isInstant);
     void writeData(std::string str);
     void giveUserResponse(bool shouldReplace, char replacement, char buf, int spot);
