@@ -150,12 +150,25 @@ string serialLine(int option){
 }
 
 void loadSettings(){
+    getPath();
     if(setting_read("msg_title", "\\Settings\\settings.txt")!="*"){
         msg_title=setting_read("msg_title", "\\Settings\\settings.txt");
     }
-    msg_MOTD=setting_read("msg_MOTD", " \\Settings\\settings.txt");
     string tempPort_name = setting_read("ser_port", "\\Settings\\settings.txt");
-    port_name= const_cast<char*>(tempPort_name.c_str());
+    msg_MOTD=setting_read("msg_MOTD", "\\Settings\\settings.txt");
+    if(setting_read("sys_OS", "\\Settings\\settings.txt")=="win"){
+        //port_name = "\\\\.\\COM4";
+        //port_name += const_cast<char*>(tempPort_name.c_str());
+        //port_name = "\\\\.\\";
+        //strcat(port_name, const_cast<char*>(tempPort_name));
+    }
+    //*port_name=const_cast<char*>(tempPort_name.c_str());
+    //port_name=const_cast<char*>(tempPort_name);
+    for(int i=0;i<strlen(port_name);i++){
+        printf("%c", port_name[i]);
+    }
+
+
 
 };
 
@@ -176,10 +189,11 @@ int login(){
 
 int main()
 {
-    //loadSettings();
-    cout<<"Establishing a connection with "<<port_name<<endl;
-    serial.connect(port_name);
-    getPath();
+    loadSettings();
+    cout<<"Establishing connection with "<<&port_name<<"... ";
+        serial.connect(port_name);
+    cout<<"OK"<<endl;
+
     serialPrint("Paradigm Communicator " + PCS_ver);
     serialPrint("The date is " + date());
     serialPrint("");
