@@ -9,12 +9,10 @@
 
 using namespace std;
 
-Serial::Serial() {
+Serial::Serial(const char* device) {
     timeout = 50000;
-}
-void Serial::initConnection() {
     // open the USB connection `file`
-    USB = open( "/dev/pts/2", O_RDWR| O_NOCTTY );
+    USB = open( device, O_RDWR| O_NOCTTY );
     // set the baud speed
     speed_t baudSpeed = B9600;
 

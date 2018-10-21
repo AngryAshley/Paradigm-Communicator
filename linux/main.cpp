@@ -88,9 +88,7 @@ void runProgram() {
 
 int main() {
     // make a new Serial object
-    serialConection = new Serial();
-    // initialize the connection
-    serialConection->initConnection();
+    serialConection = new Serial("/dev/pts/2");
     // read config (nothing right now)
     readConfig();
     // set shouldStop (for the loops in threads)
