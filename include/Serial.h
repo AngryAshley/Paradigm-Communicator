@@ -8,8 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-class SerialPort
-{
+class SerialPort{
 private:
     HANDLE handler;
     bool connected;
