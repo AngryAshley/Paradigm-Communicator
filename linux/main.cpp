@@ -69,7 +69,7 @@ bool login() {
     string username = serialConection->readData(false, '\0');
     serialConection->writeData(newLine);
     serialConection->writeData((string)"Password: ");
-    string password = serialConection->readData(true, '\0'); // stop bitching about this little thing, it works, shut up already
+    string password = serialConection->readData(true, '\0');
     serialConection->writeData(newLine);
     return checkLogin(username, password);
 }
