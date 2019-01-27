@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+#include <string.h>
+
 class SerialPort{
 private:
     HANDLE handler;
@@ -22,6 +25,11 @@ public:
     int readSerialPort(char *buffer, unsigned int buf_size);
     bool writeSerialPort(char *buffer, unsigned int buf_size);
     bool isConnected();
+
+    void print(std::string input);
+    void write(std::string input);
+    std::string readLine(int option);
+    std::string getKey();
 };
 
 #endif // SERIALPORT_H

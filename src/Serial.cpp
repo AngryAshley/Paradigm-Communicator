@@ -25,7 +25,7 @@ SerialPort::connect(char *portName){
         if (!GetCommState(this->handler, &dcbSerialParameters)) {
             printf("failed to get current serial parameters");
         } else {
-            dcbSerialParameters.BaudRate = CBR_9600;
+            dcbSerialParameters.BaudRate = CBR_300;
             dcbSerialParameters.ByteSize = 8;
             dcbSerialParameters.StopBits = ONESTOPBIT;
             dcbSerialParameters.Parity = NOPARITY;
@@ -76,4 +76,96 @@ bool SerialPort::writeSerialPort(char *buffer, unsigned int buf_size){
 
 bool SerialPort::isConnected(){
     return this->connected;
+}
+
+
+/// Extra Functions ///
+
+void SerialPort::write(std::string input){
+    const char *text = input.c_str();
+    int len = input.std::string::size();
+    for(int i=0;  i<len; i++){
+        printf("%c",text[i]);
+
+    };
+    char * convert;
+    convert = const_cast<char *>(text);
+    this->writeSerialPort(convert,len);
+}
+
+void SerialPort::print(std::string input){
+    write(input);
+    printf("\n");
+    this->writeSerialPort("\r\n",2);
+}
+
+std::string SerialPort::readLine(int option){
+    char* buf;
+    *buf = NULL;
+    bool shouldLoop = true;
+    std::string out;
+    while(shouldLoop){
+        bool shouldPrint = true;
+        this->readSerialPort(buf,1);
+        switch(*buf){
+            case '\r': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
+            case '\n': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
+            case NULL: shouldPrint=false; break;
+            case '\x08': out = out.std::string::substr(0, out.std::string::size()-1);
+                         if(option==2)break;
+                         this->writeSerialPort("\x08 \x08",3);
+                         *buf = NULL;
+                         shouldPrint=false;
+                         break;
+        }
+        if(*buf!=NULL)printf("%02X", *buf);
+        if(shouldPrint && shouldLoop){
+            out += *buf;
+            switch(option){
+            case 0: this->writeSerialPort(buf,1); break;
+            case 1: this->writeSerialPort("*",1); break;
+            case 2: this->writeSerialPort(" \x08",2); break;
+            }
+            *buf=NULL;
+        };
+    }
+    return out;
+}
+
+std::string SerialPort::getKey(){
+    char* buf;
+    //std::string output ="";
+    int i=0;
+    buf = (char*) malloc(4);
+    char* out = NULL;
+    *buf = NULL;
+    while(*buf==NULL){
+        i=this->readSerialPort(buf,1);
+    }
+        std::string output(1, *buf);
+        //output += out;
+    //printf(" buf: %02x ", *buf);
+    if(*buf=='\x1b'){
+        output="";
+        output += *buf;
+        *buf = NULL;
+        while(*buf==NULL){
+            i=this->readSerialPort(buf,1);
+        }
+        output += *buf;
+        *buf = NULL;
+        while(*buf==NULL){
+            i=this->readSerialPort(buf,1);
+        }
+        output += *buf;
+    }
+    /*
+    for(int s=0; s<3;s++){
+        printf("%02x", output[s]);
+    }
+    printf(" | ");
+    printf("%s",output);
+    */
+
+    return output;
 }

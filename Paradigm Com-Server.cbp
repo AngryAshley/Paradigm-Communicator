@@ -34,9 +34,15 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="include/FileSystemTools.h" />
 		<Unit filename="include/Serial.h" />
+		<Unit filename="include/e-mail.h" />
+		<Unit filename="include/tools.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/FileSystemTools.cpp" />
 		<Unit filename="src/Serial.cpp" />
+		<Unit filename="src/e-mail.cpp" />
+		<Unit filename="src/tools.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />
