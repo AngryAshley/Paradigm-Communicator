@@ -19,6 +19,7 @@ class e_mail{
         e_mail();
         virtual ~e_mail();
 
+        void reset();
         std::vector<std::string> mailFolder;
         std::string path;
         SerialPort serial;

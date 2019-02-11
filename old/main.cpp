@@ -1,17 +1,9 @@
 #include <iostream>
 #include <ctime>
 #include <windows.h>
-#include <fstream>
-#include <vector>
-#include <unistd.h>
-
 #include <Serial.h>
-#include <e-mail.h>
-#include <tools.h>
-
-
-
-
+#include <fstream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -21,33 +13,28 @@ int serialBaud = 6.666666;
 string PCS_ver="0.1.0 A";
 string path_exe="";
 
-typedef vector<string> strvec;
-
 /// User-end variables ///
 int sys_comNum=4;
-string misc_color="\e[1;32m\e[40m";
 string msg_title="Welcome to this Paradigm Communicator server."; //Fetch, but have a default
 string msg_MOTD=""; //Fetch, no default
-char *port_name = "\\\\.\\COM4";
+char *port_name = "\\\\.\\COM3";
 string msg_welcome="Welcome, ";
 
 /// Session Variables ///
 string uname="";
 string passwd="";
-string cmd_temp="";
-string cmd[8];
-string dir_arr[1024];
-char msg_buf[255];
 bool uname_good=false;
 bool passwd_good=false;
-vector<string> folder;
 
 /// System initialization ///
 SerialPort serial;
-Tools tools;
-e_mail mail;
 
 
+string date(){
+    time_t now = time(0);
+    char* dt = ctime(&now);
+    return dt;
+}
 void getPath() {
 char path_exe_temp[1024];
 GetModuleFileName(NULL, path_exe_temp, 1024);
@@ -84,6 +71,22 @@ string setting_read(string setting, string path){
     file.close();
 }
 
+void serialWrite(string input){
+    const char *text = input.c_str();
+    int len = input.size();
+    for(int i=0;  i<len; i++){
+        printf("%c",text[i]);
+        Sleep(serialBaud);
+    };
+    char * convert;
+    convert = const_cast<char *>(text);
+    serial.writeSerialPort(convert,len);
+}
+void serialPrint(string input){
+    serialWrite(input);
+    printf("\n");
+    serial.writeSerialPort("\r\n",2);
+}
 int query(string uname, string passwd){
     uname_good=false;
     passwd_good=false;
@@ -112,6 +115,39 @@ int query(string uname, string passwd){
 		return 2;
 	}
 }
+string serialLine(int option){
+    char* buf;
+    *buf = NULL;
+    bool shouldLoop = true;
+    string out;
+    while(shouldLoop){
+        bool shouldPrint = true;
+        serial.readSerialPort(buf,1);
+        switch(*buf){
+            case '\r': serial.writeSerialPort("\r\n",2); shouldLoop=false; break;
+            case '\n': serial.writeSerialPort("\r\n",2); shouldLoop=false; break;
+            case NULL: shouldPrint=false; break;
+            case '\x08': out = out.substr(0, out.size()-1);
+                         if(option==2)break;
+                         serial.writeSerialPort("\x08 \x08",3);
+                         *buf = NULL;
+                         shouldPrint=false;
+                         break;
+        }
+        if(*buf!=NULL)printf("%02X", *buf);
+        if(shouldPrint && shouldLoop){
+            out += *buf;
+            switch(option){
+            case 0: serial.writeSerialPort(buf,1); break;
+            case 1: serial.writeSerialPort("*",1); break;
+            case 2: serial.writeSerialPort(" \x08",2); break;
+            }
+            *buf=NULL;
+        };
+    }
+    //cout<<out;
+    return out;
+}
 
 void loadSettings(){
     getPath();
@@ -122,148 +158,49 @@ void loadSettings(){
     msg_MOTD=setting_read("msg_MOTD", "\\Settings\\settings.txt");
     if(setting_read("sys_OS", "\\Settings\\settings.txt")=="win"){
         //port_name = "\\\\.\\COM4";
-        //port_name += const_cast<char*>(tempPort_name.c_str());
         //port_name = "\\\\.\\";
+        //port_name += const_cast<char*>(tempPort_name.c_str());
         //strcat(port_name, const_cast<char*>(tempPort_name));
+
     }
+    //port_name = const_cast<char*>(tempPort_name.c_str());
     //*port_name=const_cast<char*>(tempPort_name.c_str());
     //port_name=const_cast<char*>(tempPort_name);
     for(int i=0;i<strlen(port_name);i++){
         printf("%c", port_name[i]);
     }
+
+
+
 };
 
-void read_directory(const string& name, strvec& v){
-    string pattern(name);
-    int i = 0;
-    pattern.append("\\*");
-    WIN32_FIND_DATA data;
-    HANDLE hFind;
-    if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
-        do {
-            dir_arr[i] = data.cFileName;
-            v.push_back(data.cFileName);
-            i++;
-        } while (FindNextFile(hFind, &data) != 0);
-        FindClose(hFind);
-    }
-}
-
-void login_finalize(){
-    string path = string(path_exe)+string("Users\\")+string(uname)+string("\\email\\");
-    folder.clear();
-    read_directory(path,folder);
-    mail.serial = serial;
-    mail.mailFolder = folder;
-    mail.path = path;
-    printf("path: %s",path.c_str());
-    mail.getNewMail();
-}
-
 int login(){
-    serial.write("Username: ");
-    uname=serial.readLine(0);
-    serial.write("Password: ");
-    passwd=serial.readLine(1);
-    serial.write("\n");
+    serialWrite("Username: ");
+    uname=serialLine(0);
+    serialWrite("Password: ");
+    passwd=serialLine(1);
+    serialWrite("\n");
 
     switch(query(uname, passwd)){
-    case 0: serial.print(msg_welcome + uname); login_finalize(); return 1; break;
-    case 1: serial.print("Wrong password"); login(); break;
-    case 2: serial.print("Wrong username"); login(); break;
-    default: serial.print("Unexpected Error"); login(); break;
-    }
-}
-
-int CLI(){
-    fill_n(cmd, 8, "");
-
-
-
-    serial.write(uname);
-    serial.write(">");
-
-    cmd_temp=serial.readLine(0);
-    cmd_temp = tools.to_upper(cmd_temp);
-    tools.splitString(cmd_temp, cmd);
-
-
-    if(cmd[0] == "TEST"){
-        serial.print("pooped");
-
-    } else if(cmd[0]=="EXIT") {
-        serial.print("Logging off... Bye!");
-        Sleep(1000);
-        serial.write("+++");
-        Sleep(1000);
-        serial.write("ATH0\r");
-        return 0;
-
-    } else if(cmd[0]=="BEEP"){
-        //serial.print("\a");
-        serial.print(serial.getKey());
-
-    } else if(cmd[0]=="EMAIL"){
-        if(cmd[1]=="CHECK"){
-            mail.getNewMail();
-
-        } else if(cmd[1]=="HELP"){
-            mail.help();
-        } else if(cmd[1]=="INBOX"){
-            mail.inbox();
-        } else {
-            serial.write("Bad parameter - ");
-            serial.write(cmd[1]);
-            serial.print("");
-        }
-    } else if(cmd[0]=="LOGOFF"){
-        serial.print("Logging off, bye!");
-        uname = "";
-        passwd = "";
-        mail.reset();
-        Sleep(1000);
-        return 1;
-
-
-
-
-
-    } else {
-        serial.write("Bad command - ");
-        serial.write(cmd[0]);
-        serial.print("");
-    };
-
-    serial.print("");
-    CLI();
-}
-
-void loginPrompt(){
-    serial.print(misc_color);
-    serial.write("\e[2J\e[0;0H");
-    serial.print("Paradigm Communicator " + PCS_ver);
-    serial.print("The date is " + tools.date());
-    serial.print("");
-    serial.print(msg_title);
-    serial.print("");
-
-    if(login() == 1){
-        if(CLI()==1){
-            loginPrompt();
-        }
+    case 0: serialPrint(msg_welcome + uname); break;
+    case 1: serialPrint("Wrong password"); login(); break;
+    case 2: serialPrint("Wrong username"); login(); break;
+    default: serialPrint("Unexpected Error"); login(); break;
     }
 }
 
 int main()
 {
     loadSettings();
-    cout<<"Establishing connection with "<<&port_name<<"... ";
-    serial.connect(port_name);
+    cout<<"Establishing connection with "<<port_name<<"... ";
+        serial.connect(port_name);
     cout<<"OK"<<endl;
 
-    loginPrompt();
-
-    printf("User disconnected");
-
+    serialPrint("\e[1;32;40mParadigm Communicator " + PCS_ver);
+    serialPrint("The date is " + date());
+    serialPrint("");
+    serialPrint(msg_title);
+    serialPrint("");
+    login();
     return 0;
 }

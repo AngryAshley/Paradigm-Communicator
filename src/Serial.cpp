@@ -25,7 +25,7 @@ SerialPort::connect(char *portName){
         if (!GetCommState(this->handler, &dcbSerialParameters)) {
             printf("failed to get current serial parameters");
         } else {
-            dcbSerialParameters.BaudRate = CBR_300;
+            dcbSerialParameters.BaudRate = CBR_9600;
             dcbSerialParameters.ByteSize = 8;
             dcbSerialParameters.StopBits = ONESTOPBIT;
             dcbSerialParameters.Parity = NOPARITY;
@@ -103,24 +103,30 @@ std::string SerialPort::readLine(int option){
     char* buf;
     *buf = NULL;
     bool shouldLoop = true;
+    bool shouldAdd = true;
     std::string out;
     while(shouldLoop){
         bool shouldPrint = true;
+        bool shouldAdd = true;
         this->readSerialPort(buf,1);
         switch(*buf){
             case '\r': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
             case '\n': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
             case NULL: shouldPrint=false; break;
+            case '\x7F':
             case '\x08': out = out.std::string::substr(0, out.std::string::size()-1);
                          if(option==2)break;
                          this->writeSerialPort("\x08 \x08",3);
                          *buf = NULL;
                          shouldPrint=false;
+                         shouldAdd=false;
                          break;
         }
         if(*buf!=NULL)printf("%02X", *buf);
         if(shouldPrint && shouldLoop){
-            out += *buf;
+            if(shouldAdd){
+                out += *buf;
+            }
             switch(option){
             case 0: this->writeSerialPort(buf,1); break;
             case 1: this->writeSerialPort("*",1); break;

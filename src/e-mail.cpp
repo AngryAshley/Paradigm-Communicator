@@ -8,6 +8,11 @@ e_mail::e_mail(){
 e_mail::~e_mail(){
 }
 
+void e_mail::reset(){
+    mailFolder.clear();
+    path="";
+}
+
 void e_mail::getNewMail(){
     std::string split[2];
     int amount = 0;
@@ -139,7 +144,7 @@ int e_mail::inbox_drawContent(std::string file, int page){
     serial.write("\e[4;0H\e[1;32;40m");
 
     //page++;
-    int maxLines = 21;
+    int maxLines = 20;
     float tempPageCount = content.size()/maxLines;
     pageCount = ceil(tempPageCount)+1;
     int pageSize=content.size()-(page*maxLines);
@@ -151,8 +156,14 @@ int e_mail::inbox_drawContent(std::string file, int page){
         ///page = 1;
     }
     //page++;
-    for(int i=1; i<maxLines; i++){
-        printIndex = i+(page*maxLines);
+    int iPre = 0;
+    if(page==0){
+            iPre = 1;
+            maxLines++;
+        }
+    for(int i=iPre; i<maxLines; i++){
+
+        printIndex = i+(page*21); //maxLines
         serial.print(content[printIndex]); ///Try to align end of last page with begin of new page
     };
     return pageCount;
@@ -219,7 +230,7 @@ void e_mail::inbox_openMail(int index){
         key = serial.getKey();
 
         if(key=="\e[B"){
-            if(pageIndex<pages){
+            if(pageIndex<pages-1){
                 pageIndex++;
                 this->inbox_clearWindow();
                 pages = this->inbox_drawContent(mailFolder[index+2].c_str(),pageIndex);
@@ -246,6 +257,7 @@ void e_mail::inbox(){
     //this->mail_sort();
 
     serial.write("\e[2J");
+       serial.write("\e[0;0H");
     serial.write("\e[1;37;42m\e[K PEMS - Paradigm Electronic Mail System                ");
     serial.write(tools.date());
     serial.print("\e[1;32;40m");
@@ -273,6 +285,7 @@ void e_mail::inbox(){
             this->inbox_drawMail(index,page);
             serial.write("\e[1;37;42m\e[K Arrow keys = Select mail | Enter = Open | E = Exit\e[1;32;40m");
         } else if(key=="e"){
+            serial.write("\e[2J\e[0;0H");
             break;
         };
     }
