@@ -105,6 +105,7 @@ std::string SerialPort::readLine(int option){
     bool shouldLoop = true;
     bool shouldAdd = true;
     std::string out;
+    int amount = 0;
     while(shouldLoop){
         bool shouldPrint = true;
         bool shouldAdd = true;
@@ -114,9 +115,11 @@ std::string SerialPort::readLine(int option){
             case '\n': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
             case NULL: shouldPrint=false; break;
             case '\x7F':
-            case '\x08': out = out.std::string::substr(0, out.std::string::size()-1);
+            case '\x08': if(amount>0){
+                            out = out.std::string::substr(0, out.std::string::size()-1);
+                            this->writeSerialPort("\x08 \x08",3);
+                         }
                          if(option==2)break;
-                         this->writeSerialPort("\x08 \x08",3);
                          *buf = NULL;
                          shouldPrint=false;
                          shouldAdd=false;
@@ -126,6 +129,11 @@ std::string SerialPort::readLine(int option){
         if(shouldPrint && shouldLoop){
             if(shouldAdd){
                 out += *buf;
+                amount++;
+            } else {
+                if(amount>0){
+                    amount--;
+                }
             }
             switch(option){
             case 0: this->writeSerialPort(buf,1); break;
