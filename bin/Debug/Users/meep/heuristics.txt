@@ -1,0 +1,35 @@
+heuristieken dingen
+moet ik 4 dingen van weten
+
+nielsen somethhing groep ofzo idk
+
+Consistency and Standards
+
+Visibility of system status
+
+
+Match between the system and the real world
+
+ o Sluit aan op wat de gebruiker kent
+  - Taal
+  - Representatie
+  - Procedures
+  - Etcetera
+
+Help and Documentation
+ 
+ Wanneer zoekt iemand hulp?
+ Als je echt finaal vastloopt
+ mensen proberen eerst zelf, daarna pakken ze meestal pas de handleiding
+ dit is een ballen line
+ o Makkelijk te vinden
+ o Gericht op de taak van de gebruiker
+ o Concreet en to-the-point
+
+ o Meer dan alleen een FAQ
+
+ = Uitleg bij opties bijvoorbeeld (tooltips etc)
+ = de "Meer informatie" knop
+ = helpcentrum
+ = contact
+ = zoekfunctie

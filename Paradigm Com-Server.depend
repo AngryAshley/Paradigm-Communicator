@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1549880509 source:d:\paradigm\paradigmcom-server\main.cpp
+1560758558 source:d:\paradigm\paradigmcom-server\main.cpp
 	<iostream>
 	<ctime>
 	<windows.h>
@@ -9,11 +9,12 @@
 	<Serial.h>
 	<e-mail.h>
 	<tools.h>
+	<fileSystem.h>
 
-1549537771 source:d:\paradigm\paradigmcom-server\src\serial.cpp
+1559897799 source:d:\paradigm\paradigmcom-server\src\serial.cpp
 	"Serial.h"
 
-1548665024 d:\paradigm\paradigmcom-server\include\serial.h
+1559897406 d:\paradigm\paradigmcom-server\include\serial.h
 	<windows.h>
 	<stdio.h>
 	<stdlib.h>
@@ -73,7 +74,7 @@
 1548500420 source:d:\paradigm\paradigm-communicator\src\filesystemtools.cpp
 	"FileSystemTools.h"
 
-1548666808 d:\paradigm\paradigmcom-server\include\e-mail.h
+1559643920 d:\paradigm\paradigmcom-server\include\e-mail.h
 	<Serial.h>
 	<vector>
 	<string.h>
@@ -84,24 +85,36 @@
 	<array>
 	<tgmath.h>
 
-1548665024 d:\paradigm\paradigmcom-server\include\tools.h
+1559812042 d:\paradigm\paradigmcom-server\include\tools.h
 	<iostream>
 	<string.h>
 	<stdio.h>
 	<locale>
 
-1548665024 d:\paradigm\paradigmcom-server\include\filesystemtools.h
+1548668624 d:\paradigm\paradigmcom-server\include\filesystemtools.h
 	<iostream>
 	<string.h>
 	<vector>
 	<fstream>
 
-1549880731 source:d:\paradigm\paradigmcom-server\src\e-mail.cpp
+1559900839 source:d:\paradigm\paradigmcom-server\src\e-mail.cpp
 	"e-mail.h"
 
-1548665024 source:d:\paradigm\paradigmcom-server\src\filesystemtools.cpp
+1548668624 source:d:\paradigm\paradigmcom-server\src\filesystemtools.cpp
 	"FileSystemTools.h"
 
-1548665024 source:d:\paradigm\paradigmcom-server\src\tools.cpp
+1559812042 source:d:\paradigm\paradigmcom-server\src\tools.cpp
 	"tools.h"
+
+1559898648 d:\paradigm\paradigmcom-server\include\filesystem.h
+	<iostream>
+	<string.h>
+	<vector>
+	<fstream>
+	<Serial.h>
+	<tools.h>
+	<FileSystemTools.h>
+
+1559906781 source:d:\paradigm\paradigmcom-server\src\filesystem.cpp
+	"fileSystem.h"
 

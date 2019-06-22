@@ -1,0 +1,20 @@
+penrose laboratories bootscreen
+[0m[5m[30m[43m[2J[0;0H
+                                    ллллллл
+                                 ллллллллллллл  
+                                  ллллллллллл      
+                                   ллллллллл
+                                    ллллллл           
+                                     ллллл
+                                      ллл              
+                                     ллллл
+                       ллллллллллллллллллллллллллллллллл
+                        ллллллллллллл ллл ллллллллллллл
+                         ллллллллллл       ллллллллллл
+                          ллллллллл         ллллллллл
+                           лллллл           лллллл
+                             ллл             ллл
+                                           
+                                        
+       	        WARNING - NUCLEAR REACTOR FAILED, MELTDOWN IMMINENT
+                        EVACUATE THE FACILITY IMMEDIATELY

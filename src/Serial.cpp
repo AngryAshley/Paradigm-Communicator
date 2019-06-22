@@ -150,7 +150,7 @@ std::string SerialPort::getKey(){
     char* buf;
     //std::string output ="";
     int i=0;
-    buf = (char*) malloc(4);
+    buf = (char*) malloc(5);
     char* out = NULL;
     *buf = NULL;
     while(*buf==NULL){
@@ -172,7 +172,15 @@ std::string SerialPort::getKey(){
             i=this->readSerialPort(buf,1);
         }
         output += *buf;
+        if(*buf=='\x36'){
+            *buf = NULL;
+            while(*buf==NULL){
+                i=this->readSerialPort(buf,1);
+            }
+            output += *buf;
+        }
     }
+
     /*
     for(int s=0; s<3;s++){
         printf("%02x", output[s]);
@@ -181,5 +189,6 @@ std::string SerialPort::getKey(){
     printf("%s",output);
     */
 
+    *buf=NULL;
     return output;
 }

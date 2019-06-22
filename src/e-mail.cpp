@@ -141,7 +141,8 @@ int e_mail::inbox_drawContent(std::string file, int page){
     file_path.std::string::append(file);
     printf(" file: %s",file_path.c_str());
     std::vector<std::string> content = fstools.file_getAll(file_path.c_str());
-    serial.write("\e[4;0H\e[1;32;40m");
+    serial.write("\e[4;0H"); ///1;32;40
+    serial.write(defColor);
 
     //page++;
     int maxLines = 20;
@@ -158,13 +159,19 @@ int e_mail::inbox_drawContent(std::string file, int page){
     //page++;
     int iPre = 0;
     if(page==0){
-            iPre = 1;
-            maxLines++;
-        }
+        iPre = 1;
+        //maxLines++;
+        if(content.size()<22){
+            maxLines=content.size();
+        };
+    } else {
+        maxLines = content.size()-(21*page);   ///WORKED ON THIS LAST TIME!!! CHECK THIS!!!
+    }
     for(int i=iPre; i<maxLines; i++){
 
         printIndex = i+(page*21); //maxLines
         serial.print(content[printIndex]); ///Try to align end of last page with begin of new page
+        printf("%S",content[printIndex]);
     };
     return pageCount;
 }
@@ -176,14 +183,15 @@ int e_mail::inbox_drawMail(int index, int page){
     int am = 0;
     //int linesToGo=23;
     int indexOffset = index+2;
-    serial.write("\e[4;0H\e[1;32;40m");
+    serial.write("\e[4;0H");
+    serial.write(defColor);
     for(std::vector<int>::size_type i = 0; i != mailFolder.size();i++){
         tools.splitString(mailFolder[i].c_str(),split,".");
         if(split[1]=="new"||split[1]=="old"){
             if(indexOffset==i){
-                serial.write(" ¯ \e[1;37;42m");
+                serial.write(" ¯ \e[7m");
             } else {
-                serial.write("   ");
+                serial.write("\e[0m"+defColor+"   ");
             }
             am++;
             serial.write(split[0]);
@@ -202,7 +210,7 @@ int e_mail::inbox_drawMail(int index, int page){
             serial.write(command);
             serial.write(mailInfo[1]);
 
-            serial.print("\e[1;32;40m");
+            serial.print(defColor);
         }
         fill_n(split, 2, "");
         fill_n(mailInfo, 1, "");
@@ -218,11 +226,11 @@ void e_mail::inbox_openMail(int index){
     int pageIndex = 0;
     this->inbox_clearWindow();
     pages = this->inbox_drawContent(mailFolder[index+2].c_str(),pageIndex);
-    serial.write("\e[24;0H\e[1;37;42m\e[K R = Reply | E = Exit");
+    serial.write("\e[24;0H\e[7m\e[K R = Reply | E = Exit");
 
     if(pages>0) serial.write(" | Arrow Page = page up/down");
 
-    serial.write("\e[1;32;40m");
+    serial.write("\e[7m");
 
     printf("\n pages = %d, pageIndex = %d, index = %d", pages, pageIndex, index);
 
@@ -256,15 +264,18 @@ void e_mail::inbox(){
 
     //this->mail_sort();
 
+    serial.write("\e[0m");
+    serial.write(defColor);
     serial.write("\e[2J");
-       serial.write("\e[0;0H");
-    serial.write("\e[1;37;42m\e[K PEMS - Paradigm Electronic Mail System                ");
+    serial.write("\e[0;0H");
+    serial.write("\e[7m\e[K PEMS - Paradigm Electronic Mail System                ");
     serial.write(tools.date());
-    serial.print("\e[1;32;40m");
+    serial.print("\e[0m" + defColor);
                ///11111111111111111111111111111111111111112222222222222222222222222222222222222222   80-Columns
     serial.print(" Ä INBOX ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ");
     amount = this->inbox_drawMail(index,page);
-    serial.write("\e[1;37;42m\e[K Arrow keys = Select mail | Enter = Open | E = Exit\e[1;32;40m");
+    serial.write("\e[7m\e[K Arrow keys = Select mail | Enter = Open | E = Exit\e[0m");
+    serial.write(defColor);
 
     while(true){
         key = serial.getKey();
@@ -283,11 +294,12 @@ void e_mail::inbox(){
             this->inbox_openMail(index);
             this->inbox_clearWindow();
             this->inbox_drawMail(index,page);
-            serial.write("\e[1;37;42m\e[K Arrow keys = Select mail | Enter = Open | E = Exit\e[1;32;40m");
+            serial.write("\e[7m\e[K Arrow keys = Select mail | Enter = Open | E = Exit\e[0m");
+            serial.write(defColor);
         } else if(key=="e"){
             serial.write("\e[2J\e[0;0H");
             break;
         };
     }
-    serial.write("\e[2J\e[1;32;40m");
+    serial.write("\e[2J\e[0m"+defColor);
 }

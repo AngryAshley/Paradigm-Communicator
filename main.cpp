@@ -8,6 +8,7 @@
 #include <Serial.h>
 #include <e-mail.h>
 #include <tools.h>
+#include <fileSystem.h>
 
 
 
@@ -23,11 +24,19 @@ string path_exe="";
 
 typedef vector<string> strvec;
 
+/// System initialization ///
+SerialPort serial;
+Tools tools;
+e_mail mail;
+fileSystem fs;
+
 /// User-end variables ///
 int sys_comNum=4;
 string misc_color="\e[1;32m\e[40m";
+string misc_defColor="\e[1;37m\e[44m";
 string msg_title="Welcome to this Paradigm Communicator server."; //Fetch, but have a default
-string msg_MOTD=""; //Fetch, no default
+bool msg_title_bigLogo=true;
+string msg_MOTD="\e[2J\e[0;0HThe date is " + tools.date(); //Fetch, no default
 char *port_name = "\\\\.\\COM4";
 string msg_welcome="Welcome, ";
 
@@ -37,15 +46,14 @@ string passwd="";
 string cmd_temp="";
 string cmd[8];
 string dir_arr[1024];
+string homefolder="";
+string temppath;
 char msg_buf[255];
 bool uname_good=false;
 bool passwd_good=false;
 vector<string> folder;
 
-/// System initialization ///
-SerialPort serial;
-Tools tools;
-e_mail mail;
+
 
 
 void getPath() {
@@ -115,11 +123,11 @@ int query(string uname, string passwd){
 
 void loadSettings(){
     getPath();
-    if(setting_read("msg_title", "\\Settings\\settings.txt")!="*"){
-        msg_title=setting_read("msg_title", "\\Settings\\settings.txt");
+    if(setting_read("msg_title", "\\Settings\\title.txt")!="*"){
+        msg_title=setting_read("msg_title", "\\Settings\\title.txt");
     }
     string tempPort_name = setting_read("ser_port", "\\Settings\\settings.txt");
-    msg_MOTD=setting_read("msg_MOTD", "\\Settings\\settings.txt");
+    ///msg_MOTD=setting_read("msg_MOTD", "\\Settings\\settings.txt");
     if(setting_read("sys_OS", "\\Settings\\settings.txt")=="win"){
         //port_name = "\\\\.\\COM4";
         //port_name += const_cast<char*>(tempPort_name.c_str());
@@ -131,6 +139,7 @@ void loadSettings(){
     for(int i=0;i<strlen(port_name);i++){
         printf("%c", port_name[i]);
     }
+
 };
 
 void read_directory(const string& name, strvec& v){
@@ -153,11 +162,14 @@ void login_finalize(){
     string path = string(path_exe)+string("Users\\")+string(uname)+string("\\email\\");
     folder.clear();
     read_directory(path,folder);
-    mail.serial = serial;
     mail.mailFolder = folder;
     mail.path = path;
     printf("path: %s",path.c_str());
     mail.getNewMail();
+    mail.defColor = misc_defColor;
+    fs.defColor = misc_defColor;
+    homefolder = string(path_exe)+string("Users\\")+string(uname)+string("\\");
+    fs.cd = homefolder;
 }
 
 int login(){
@@ -168,7 +180,7 @@ int login(){
     serial.write("\n");
 
     switch(query(uname, passwd)){
-    case 0: serial.print(msg_welcome + uname); login_finalize(); return 1; break;
+    case 0: if(msg_MOTD!=""){serial.print(msg_MOTD);}; serial.print(msg_welcome + uname); login_finalize(); return 1; break;
     case 1: serial.print("Wrong password"); login(); break;
     case 2: serial.print("Wrong username"); login(); break;
     default: serial.print("Unexpected Error"); login(); break;
@@ -179,14 +191,18 @@ int CLI(){
     fill_n(cmd, 8, "");
 
 
-
+    temppath=fs.cd;
     serial.write(uname);
+    serial.write("@");
+    temppath.erase(0, homefolder.size());
+    serial.write(temppath);
+
     serial.write(">");
 
     cmd_temp=serial.readLine(0);
-    cmd_temp = tools.to_upper(cmd_temp);
-    tools.splitString(cmd_temp, cmd);
-
+    ///cmd_temp = tools.to_upper(cmd_temp);
+    tools.splitString(cmd_temp, cmd," ");
+    cmd[0]=tools.to_upper(cmd[0]);
 
     if(cmd[0] == "TEST"){
         serial.print("pooped");
@@ -200,10 +216,11 @@ int CLI(){
         return 0;
 
     } else if(cmd[0]=="BEEP"){
-        //serial.print("\a");
-        serial.print(serial.getKey());
+        serial.print("\a");
+        //serial.print(serial.getKey());
 
     } else if(cmd[0]=="EMAIL"){
+        cmd[1]=tools.to_upper(cmd[1]);
         if(cmd[1]=="CHECK"){
             mail.getNewMail();
 
@@ -220,18 +237,45 @@ int CLI(){
         serial.print("Logging off, bye!");
         uname = "";
         passwd = "";
+        homefolder = "";
+        fs.cd = "";
         mail.reset();
         Sleep(1000);
+        printf("sleep finished\n");
         return 1;
 
+    } else if(cmd[0]=="DIR"){
+        fs.showDir();
+
+    } else if(cmd[0]=="CD"){
+        printf("%s",cmd[1]);
+        if(cmd[1]==".."){
+            if(fs.cd == homefolder){
+                serial.print("Access denied");
+            } else {
+                fs.changeDir(cmd[1]);
+            }
+        } else {
+            //serial.print(cmd[1]);
+            fs.changeDir(cmd[1]);
+        }
 
 
+    } else if(cmd[0]=="PRINT"){
+        if(fs.fileExists(fs.cd+cmd[1])){
+            fs.printBigFile(fs.cd+cmd[1]);
+        } else {
+            serial.write("File "+cmd[1]+" not found");
+        }
 
-
+    } else if(cmd[0]=="LOCKDOWN"){
+        string command = string(path_exe)+string("\\Resources\\meltdown.mp3");
+        getPath();
+        fs.printBigFile(string(path_exe)+string("Resources\\meltdown.txt"));
+        system(command.c_str());
+        serial.getKey();
     } else {
-        serial.write("Bad command - ");
-        serial.write(cmd[0]);
-        serial.print("");
+        serial.write("Bad command - "+cmd[0]+"");
     };
 
     serial.print("");
@@ -239,17 +283,26 @@ int CLI(){
 }
 
 void loginPrompt(){
+    serial.write("\e[0m");
     serial.print(misc_color);
     serial.write("\e[2J\e[0;0H");
     serial.print("Paradigm Communicator " + PCS_ver);
     serial.print("The date is " + tools.date());
     serial.print("");
-    serial.print(msg_title);
+    if(msg_title_bigLogo){
+        mail.inbox_drawContent(string(path_exe)+string("\\Settings\\title.txt"),0);
+    } else {
+        serial.print(msg_title);
+    }
+
     serial.print("");
 
     if(login() == 1){
-        if(CLI()==1){
+            int ret = CLI();
+        if(ret==1){
             loginPrompt();
+        } else {
+            printf(" error %i ",ret);
         }
     }
 }
@@ -260,6 +313,8 @@ int main()
     cout<<"Establishing connection with "<<&port_name<<"... ";
     serial.connect(port_name);
     cout<<"OK"<<endl;
+        mail.serial = serial;
+        fs.serial = serial;
 
     loginPrompt();
 

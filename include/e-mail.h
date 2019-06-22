@@ -22,12 +22,13 @@ class e_mail{
         void reset();
         std::vector<std::string> mailFolder;
         std::string path;
+        std::string defColor;
         SerialPort serial;
 
         void getNewMail();
         void help();
         void inbox();
-
+        int inbox_drawContent(std::string path, int page);
 
     private:
 
@@ -36,7 +37,7 @@ class e_mail{
 
         int inbox_drawMail(int index, int page);
         void mail_sort();
-        int inbox_drawContent(std::string path, int page);
+
         void inbox_clearWindow();
         void inbox_openMail(int index);
 };
