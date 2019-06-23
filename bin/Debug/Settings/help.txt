@@ -1,0 +1,11 @@
+Available commands:
+    BEEP - Test your PC speaker
+    CD - Change directory
+    DIR - Display contents of current directory
+  * EMAIL - Electronic mail management system
+    EXIT - Terminate connection with server
+    HELP - Display this message
+    LOGOFF - Log off of the server without terminating connection
+    PRINT - Print contents of a file
+	
+    Commands preceded with an * have an internal manual, call with "<cmd> HELP"

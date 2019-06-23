@@ -1,5 +1,5 @@
 sys_os=win
-ser_port=\\\\.\\COM4
+ser_port=4
 msg_MOTD=
 
 //Title has a default value, called with "*" 

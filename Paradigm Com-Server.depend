@@ -21,7 +21,7 @@
 	<iostream>
 	<string.h>
 
-1548580171 source:d:\paradigm\paradigm-communicator\main.cpp
+1561279068 source:d:\paradigm\paradigm-communicator\main.cpp
 	<iostream>
 	<ctime>
 	<windows.h>
@@ -31,21 +31,23 @@
 	<Serial.h>
 	<e-mail.h>
 	<tools.h>
+	<fileSystem.h>
+	<users.h>
 
-1548449180 d:\paradigm\paradigm-communicator\include\serial.h
+1561231915 d:\paradigm\paradigm-communicator\include\serial.h
 	<windows.h>
 	<stdio.h>
 	<stdlib.h>
 	<iostream>
 	<string.h>
 
-1548500854 source:d:\paradigm\paradigm-communicator\src\serial.cpp
+1561284556 source:d:\paradigm\paradigm-communicator\src\serial.cpp
 	"Serial.h"
 
-1548580094 source:d:\paradigm\paradigm-communicator\src\e-mail.cpp
+1561207366 source:d:\paradigm\paradigm-communicator\src\e-mail.cpp
 	"e-mail.h"
 
-1548536884 d:\paradigm\paradigm-communicator\include\e-mail.h
+1561197923 d:\paradigm\paradigm-communicator\include\e-mail.h
 	<Serial.h>
 	<vector>
 	<string.h>
@@ -56,22 +58,23 @@
 	<array>
 	<tgmath.h>
 
-1548493211 source:d:\paradigm\paradigm-communicator\src\tools.cpp
+1561211137 source:d:\paradigm\paradigm-communicator\src\tools.cpp
 	"tools.h"
 
-1548493194 d:\paradigm\paradigm-communicator\include\tools.h
+1561207276 d:\paradigm\paradigm-communicator\include\tools.h
 	<iostream>
 	<string.h>
 	<stdio.h>
 	<locale>
+	<fstream>
 
-1548500410 d:\paradigm\paradigm-communicator\include\filesystemtools.h
+1548504010 d:\paradigm\paradigm-communicator\include\filesystemtools.h
 	<iostream>
 	<string.h>
 	<vector>
 	<fstream>
 
-1548500420 source:d:\paradigm\paradigm-communicator\src\filesystemtools.cpp
+1548504020 source:d:\paradigm\paradigm-communicator\src\filesystemtools.cpp
 	"FileSystemTools.h"
 
 1559643920 d:\paradigm\paradigmcom-server\include\e-mail.h
@@ -117,4 +120,27 @@
 
 1559906781 source:d:\paradigm\paradigmcom-server\src\filesystem.cpp
 	"fileSystem.h"
+
+1561275952 d:\paradigm\paradigm-communicator\include\filesystem.h
+	<iostream>
+	<string.h>
+	<vector>
+	<fstream>
+	<Serial.h>
+	<tools.h>
+	<FileSystemTools.h>
+
+1561281664 source:d:\paradigm\paradigm-communicator\src\filesystem.cpp
+	"fileSystem.h"
+
+1561240393 d:\paradigm\paradigm-communicator\include\users.h
+	<tools.h>
+	<Serial.h>
+	<io.h>
+	<fileSystem.h>
+	<fstream>
+	<windows.h>
+
+1561275928 source:d:\paradigm\paradigm-communicator\src\users.cpp
+	"Users.h"
 

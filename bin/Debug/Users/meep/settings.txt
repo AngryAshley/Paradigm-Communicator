@@ -1,0 +1,2 @@
+password=poop
+authLevel=10

@@ -1,0 +1,2 @@
+password=the man
+authLevel=8

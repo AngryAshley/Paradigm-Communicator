@@ -1,0 +1,2 @@
+password=z8CjKZLA
+authLevel=5

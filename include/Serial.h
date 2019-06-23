@@ -20,7 +20,7 @@ private:
 public:
     SerialPort();
     ~SerialPort();
-    int connect(char *portName);
+    int connect(std::string portName);
 
     int readSerialPort(char *buffer, unsigned int buf_size);
     bool writeSerialPort(char *buffer, unsigned int buf_size);
@@ -28,7 +28,7 @@ public:
 
     void print(std::string input);
     void write(std::string input);
-    std::string readLine(int option);
+    std::string readLine(int option, int specialChar=0);
     std::string getKey();
 };
 

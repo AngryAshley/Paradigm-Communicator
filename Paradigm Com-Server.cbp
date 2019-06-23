@@ -39,12 +39,14 @@
 		<Unit filename="include/e-mail.h" />
 		<Unit filename="include/fileSystem.h" />
 		<Unit filename="include/tools.h" />
+		<Unit filename="include/users.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/FileSystemTools.cpp" />
 		<Unit filename="src/Serial.cpp" />
 		<Unit filename="src/e-mail.cpp" />
 		<Unit filename="src/fileSystem.cpp" />
 		<Unit filename="src/tools.cpp" />
+		<Unit filename="src/users.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

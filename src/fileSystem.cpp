@@ -12,6 +12,7 @@ fileSystem::~fileSystem()
 
 void fileSystem::showDir(){
     std::string pattern(cd);
+    std::string path;
     int filesFound = 0;
     pattern.append("\\*");
     FILETIME ft;
@@ -19,25 +20,25 @@ void fileSystem::showDir(){
     HANDLE hFind;
     if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
         do {
-            filesFound++;
-            std::string path = cd + "\\";
+            path = cd + "\\";
             path.append(data.cFileName);
-            SYSTEMTIME stUTC;
-
             DWORD attr = GetFileAttributes(path.c_str());
+            printf("Attr %d", attr);
+            if((attr & FILE_ATTRIBUTE_HIDDEN)==FILE_ATTRIBUTE_HIDDEN){
+            } else {
+            filesFound++;
 
+            SYSTEMTIME stUTC;
             FileTimeToSystemTime(&data.ftLastWriteTime, &stUTC);
-            //printf(" %s %d ", path.c_str(), attr);
-            serial.write(" ");
-            serial.write(data.cFileName);
+            char timestr [50];
+            sprintf(timestr,"%02d/%02d/%d %02d:%02d", stUTC.wDay, stUTC.wMonth, stUTC.wYear, stUTC.wHour, stUTC.wMinute);
+
+            serial.write(" "+std::string(data.cFileName));
             if(FILE_ATTRIBUTE_DIRECTORY == attr){
                 serial.write("\e[40D\e[15C <DIR>");
             }
-            serial.write("\e[40D\e[22C");
-            char timestr [50];
-            sprintf(timestr,"%02d/%02d/%d %02d:%02d", stUTC.wDay, stUTC.wMonth, stUTC.wYear, stUTC.wHour, stUTC.wMinute);
-            serial.print(timestr);
-
+            serial.print("\e[40D\e[22C"+std::string(timestr));
+            }
         } while (FindNextFile(hFind, &data) != 0);
         FindClose(hFind);
     }
@@ -60,7 +61,7 @@ void fileSystem::changeDir(std::string dir){
         cd.append("\\");
         printf("changing path %s",cd.c_str());
     } else {
-        serial.print("No such file or directory");
+        serial.print("No such directory");
     }
 }
 
@@ -74,8 +75,8 @@ void fileSystem::printBigFile(std::string path){
         maxLines=lines;
         bigfile=false;
     }
-    serial.write("\e[0m");
-    serial.write(defColor);
+    serial.write("\e[0m"+defColor);
+    //serial.write(defColor);
     for(int i=0; i<lines; ){
         linesLeft=lines-i;
         if(linesLeft<maxLines){
@@ -86,14 +87,15 @@ void fileSystem::printBigFile(std::string path){
             i++;
         }
         if(linesLeft>maxLines){
-            serial.write("\e[7m\e[K Press PgDn to continue, any other key to exit \e[0m");
+            serial.write("\e[7m\e[K Press PgDn or arrow-down to continue, any other key to exit \e[0m"+defColor);
             serial.write(defColor);
             key = serial.getKey();
             printf("key=%s", key.c_str());
-            if(key=="\e[6~"){
-                serial.write("\e[50D\e[K");
+            if(key=="\e[6~"||key=="\e[B"){
+                serial.write("\e[80D\e[K");
                 continue;
             } else {
+                serial.write("\e[80D\e[K");
                 break;
             }
         }
@@ -118,6 +120,12 @@ bool fileSystem::fileExists(const std::string& fileName){
 
   return true;    // this is not a directory!
 }
+void fileSystem::hideFile(const std::string& fileName){
+    DWORD ftyp = GetFileAttributesA(fileName.c_str());
+   if ((ftyp & FILE_ATTRIBUTE_HIDDEN) == 0) {
+       SetFileAttributes(fileName.c_str(), ftyp | FILE_ATTRIBUTE_HIDDEN);
+    }
+}
 
 std::vector<int> fileSystem::findLocation(std::string sample, char findIt){
     std::vector<int> characterLocations;
@@ -128,3 +136,96 @@ std::vector<int> fileSystem::findLocation(std::string sample, char findIt){
     return characterLocations;
 }
 
+void fileSystem::read_dir_vect(const std::string& name, std::vector<std::string>& v){
+    std::string pattern(name);
+    //int i = 0;
+    pattern.append("\\*");
+    WIN32_FIND_DATA data;
+    HANDLE hFind;
+    if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
+        do {
+            //dir_arr[i] = data.cFileName;
+            v.push_back(data.cFileName);
+            //i++;
+        } while (FindNextFile(hFind, &data) != 0);
+        FindClose(hFind);
+    }
+}
+
+std::string fileSystem::getPath(){
+char path_exe_temp[1024];
+GetModuleFileName(NULL, path_exe_temp, 1024);
+int pos=std::string(path_exe_temp).find_last_of("\\/");
+return std::string(path_exe_temp).substr( 0, pos+1);
+}
+
+int fileSystem::DeleteDirectory(const std::string &refcstrRootDirectory, bool bDeleteSubdirectories){
+  bool            bSubdirectory = false;       // Flag, indicating whether
+                                               // subdirectories have been found
+  HANDLE          hFile;                       // Handle to directory
+  std::string     strFilePath;                 // Filepath
+  std::string     strPattern;                  // Pattern
+  WIN32_FIND_DATA FileInformation;             // File information
+
+
+  strPattern = refcstrRootDirectory + "\\*.*";
+  hFile = ::FindFirstFile(strPattern.c_str(), &FileInformation);
+  if(hFile != INVALID_HANDLE_VALUE)
+  {
+    do
+    {
+      if(FileInformation.cFileName[0] != '.')
+      {
+        strFilePath.erase();
+        strFilePath = refcstrRootDirectory + "\\" + FileInformation.cFileName;
+
+        if(FileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+          if(bDeleteSubdirectories)
+          {
+            // Delete subdirectory
+            int iRC = DeleteDirectory(strFilePath, bDeleteSubdirectories);
+            if(iRC)
+              return iRC;
+          }
+          else
+            bSubdirectory = true;
+        }
+        else
+        {
+          // Set file attributes
+          if(::SetFileAttributes(strFilePath.c_str(),
+                                 FILE_ATTRIBUTE_NORMAL) == FALSE)
+            return ::GetLastError();
+
+          // Delete file
+          if(::DeleteFile(strFilePath.c_str()) == FALSE)
+            return ::GetLastError();
+        }
+      }
+    } while(::FindNextFile(hFile, &FileInformation) == TRUE);
+
+    // Close handle
+    ::FindClose(hFile);
+
+    DWORD dwError = ::GetLastError();
+    if(dwError != ERROR_NO_MORE_FILES)
+      return dwError;
+    else
+    {
+      if(!bSubdirectory)
+      {
+        // Set directory attributes
+        if(::SetFileAttributes(refcstrRootDirectory.c_str(),
+                               FILE_ATTRIBUTE_NORMAL) == FALSE)
+          return ::GetLastError();
+
+        // Delete directory
+        if(::RemoveDirectory(refcstrRootDirectory.c_str()) == FALSE)
+          return ::GetLastError();
+      }
+    }
+  }
+
+  return 0;
+}

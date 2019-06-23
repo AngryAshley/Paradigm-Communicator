@@ -1,13 +1,15 @@
 #include "Serial.h"
 
+//char *port_name="\\\\.\\COM4"; //old port name variable
+
 SerialPort::SerialPort(){
     this->connected = false;
 }
 
-SerialPort::connect(char *portName){
+SerialPort::connect(std::string portName){
     this->connected = false;
 
-    this->handler = CreateFileA(static_cast<LPCSTR>(portName),
+    this->handler = CreateFileA(static_cast<LPCSTR>(portName.c_str()), //static_cast<LPCSTR>(portName)
                                 GENERIC_READ | GENERIC_WRITE,
                                 0,
                                 NULL,
@@ -16,9 +18,11 @@ SerialPort::connect(char *portName){
                                 NULL);
     if (this->handler == INVALID_HANDLE_VALUE){
         if (GetLastError() == ERROR_FILE_NOT_FOUND){
-            printf("SERIAL_ERROR: Handle was not attached, %s not available\n", portName);
+            printf("SERIAL_ERROR: Handle was not attached, %s not available\n", portName.c_str());
+            return 1;
         } else {
             printf("SERIAL_ERROR: %s",strerror(GetLastError()));
+            return 1;
         }
     } else {
         DCB dcbSerialParameters = {0};
@@ -34,13 +38,16 @@ SerialPort::connect(char *portName){
             if (!SetCommState(handler, &dcbSerialParameters))
             {
                 printf("ALERT: could not set Serial port parameters\n");
+                return 1;
             } else {
                 this->connected = true;
                 PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
                 Sleep(ARDUINO_WAIT_TIME);
+                return 0;
             }
         }
     }
+    return 0;
 }
 
 SerialPort::~SerialPort(){
@@ -99,18 +106,23 @@ void SerialPort::print(std::string input){
     this->writeSerialPort("\r\n",2);
 }
 
-std::string SerialPort::readLine(int option){
+std::string SerialPort::readLine(int option, int specialChar){
     char* buf;
     *buf = NULL;
     bool shouldLoop = true;
     bool shouldAdd = true;
     std::string out;
+    std::string in ="";
     int amount = 0;
     while(shouldLoop){
         bool shouldPrint = true;
         bool shouldAdd = true;
-        this->readSerialPort(buf,1);
+        //this->readSerialPort(buf,1);
+        in = this->getKey();
+        if(in.size()<2){
+            *buf = in.c_str()[0];
         switch(*buf){
+
             case '\r': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
             case '\n': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
             case NULL: shouldPrint=false; break;
@@ -118,12 +130,19 @@ std::string SerialPort::readLine(int option){
             case '\x08': if(amount>0){
                             out = out.std::string::substr(0, out.std::string::size()-1);
                             this->writeSerialPort("\x08 \x08",3);
+                            amount--;
                          }
                          if(option==2)break;
                          *buf = NULL;
                          shouldPrint=false;
                          shouldAdd=false;
                          break;
+        }
+        } else {
+            shouldAdd=false;
+            if(in=="\e[A"||in=="\e[B"||in=="\e[C"||in=="\e[D"){shouldPrint=false;};
+            if(shouldPrint)this->write(in);
+            //return "";
         }
         if(*buf!=NULL)printf("%02X", *buf);
         if(shouldPrint && shouldLoop){
@@ -143,6 +162,7 @@ std::string SerialPort::readLine(int option){
             *buf=NULL;
         };
     }
+
     return out;
 }
 

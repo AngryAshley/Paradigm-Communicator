@@ -81,7 +81,7 @@ void e_mail::mail_sort(){
     }
 
     while(sorted = false){
-        int smallest = 99999999999999999999;
+        int smallest = 9999;
         sorted = true;
         for(int i=0; i<arr_size;i++){
             int *result = std::find(alreadySorted, alreadySorted+1024, i);
@@ -126,6 +126,7 @@ void e_mail::mail_sort(){
 
 void e_mail::inbox_clearWindow(){
     serial.write("\e[4;0H");
+    serial.write("\e[0m"+defColor);
     for(int i=0; i<20; i++){
         serial.print("\e[K");
     }
@@ -183,6 +184,7 @@ int e_mail::inbox_drawMail(int index, int page){
     int am = 0;
     //int linesToGo=23;
     int indexOffset = index+2;
+    serial.write("\e[0m"+defColor);
     serial.write("\e[4;0H");
     serial.write(defColor);
     for(std::vector<int>::size_type i = 0; i != mailFolder.size();i++){
@@ -226,7 +228,7 @@ void e_mail::inbox_openMail(int index){
     int pageIndex = 0;
     this->inbox_clearWindow();
     pages = this->inbox_drawContent(mailFolder[index+2].c_str(),pageIndex);
-    serial.write("\e[24;0H\e[7m\e[K R = Reply | E = Exit");
+    serial.write("\e[24;0H\e[0m"+defColor+"\e[7m\e[K R = Reply | E = Exit");
 
     if(pages>0) serial.write(" | Arrow Page = page up/down");
 

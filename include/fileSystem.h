@@ -23,6 +23,10 @@ class fileSystem
         bool dirExists(const std::string& dirName_in);
         bool fileExists(const std::string& fileName);
         void printBigFile(std::string path);
+        void read_dir_vect(const std::string& name, std::vector<std::string>& v);
+        std::string getPath();
+        int DeleteDirectory(const std::string &refcstrRootDirectory, bool bDeleteSubdirectories = true);
+        void hideFile(const std::string& fileName);
 
         std::string defColor;
         std::string cd;

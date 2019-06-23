@@ -1,0 +1,2 @@
+password=hallo
+authLevel=9
