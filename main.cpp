@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <unistd.h>
+#include <cstdlib>
 
 #include <Serial.h>
 #include <e-mail.h>
@@ -20,6 +21,7 @@ char incomingData[MAX_DATA_LENGTH];
 int serialBaud = 6.666666;
 string PCS_ver="0.1.0 A";
 string path_exe="";
+bool ASHLEYmode=false;
 
 typedef vector<string> strvec;
 
@@ -68,6 +70,7 @@ void loadSettings(){
 
     getPath();
     tools.pathexe = path_exe;
+    printf("[INFO] Path is %s\n",path_exe.c_str());
     if(tools.setting_read("msg_title", "\\Settings\\title.txt")!="*"){
         msg_title=tools.setting_read("msg_title", "\\Settings\\title.txt");
     }
@@ -143,7 +146,7 @@ int CLI(){
         fs.showDir();
 
     } else if(cmd[0]=="CD"){
-        printf("%s",cmd[1]);
+        printf("%s",cmd[1].c_str());
         if(cmd[1]==".."){
             if(fs.cd == homefolder && users.auth(uname)<=9){
                 serial.print("Access denied");
@@ -246,6 +249,44 @@ int login(){
     return ret;
 }
 
+int ashleyBoot(){
+    int timer = 11; ///Timeout
+    //timer =(rand() % 10) + 1; ///Random Generator
+
+    serial.write("\e[0m"+misc_color+"\e[2J\e[0;0H");
+    serial.getKey();
+    serial.write("\e[12B                        Accessing networking subsystem");
+    Sleep(1537);
+    serial.write("\e[80D                           Establishing connection      ");
+    for(int i=0; i<=10; i++){
+        if(i%4==0){
+            serial.write("\e[6D      \e[6D");
+        } else {
+            serial.write(" .");
+        }
+        Sleep(1000);
+        if(i==timer){
+            return 0;
+        };
+    }
+    serial.write("\a\r\n              Error establishing connection - connection timed out");
+    serial.getKey();
+    serial.print("\r\n\r\n  - MANUAL CONTROL MODE ENABLED - ");
+    while(true){
+        serial.write("@>");
+        cmd_temp=serial.readLine(0);
+        if(cmd_temp=="disconnect"){
+            for(int i=0; i<=25; i++){
+                serial.print("");
+            }
+            serial.write("\e[2J");
+            return 1;
+        }
+        Sleep(10);
+        cmd_temp="";
+    }
+}
+
 void loginPrompt(){
     serial.write("\e[0m"+misc_color+"\e[2J\e[0;0H");
     serial.print("Paradigm Communicator " + PCS_ver);
@@ -286,6 +327,11 @@ int main(){
         ashley.serial = serial;
         ashley.tools = tools;
 
+    if(ASHLEYmode){
+        if(ashleyBoot()!=0){
+            return 0;
+        };
+    }
     loginPrompt();
 
     printf("User disconnected");

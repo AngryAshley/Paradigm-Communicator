@@ -13,7 +13,7 @@ Tools::~Tools()
 std::string Tools::setting_read(std::string setting, std::string path){
     std::string line;
     std::ifstream file;
-    //cout<<"Opening file "<<path<<" from "<<path_exe<<endl;
+    //printf("Opening file %s from %s\n", path.c_str(), pathexe.c_str());
     std::string fullPath = pathexe + path;
     std::string fetched_setting, var;
     file.open(fullPath);
