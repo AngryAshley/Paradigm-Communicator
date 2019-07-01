@@ -10,6 +10,7 @@
 #include <tools.h>
 #include <fileSystem.h>
 #include <users.h>
+#include <ASHLEY.h>
 
 
 using namespace std;
@@ -28,6 +29,7 @@ Tools tools;
 e_mail mail;
 fileSystem fs;
 Users users;
+ASHLEY ashley;
 
 /// User-end variables ///
 int sys_comNum=4;
@@ -189,7 +191,8 @@ int CLI(){
         } else {
             serial.print("Bad parameter - "+cmd[1]+"\r\n");
         }
-
+    } else if(cmd[0]=="ASHLEY"){
+        ashley.controlPanel();
 
 
     } else {
@@ -280,6 +283,8 @@ int main(){
         users.serial = serial;
         users.tools = tools;
         users.fs = fs;
+        ashley.serial = serial;
+        ashley.tools = tools;
 
     loginPrompt();
 
