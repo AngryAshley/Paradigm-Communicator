@@ -144,3 +144,83 @@
 1561275928 source:d:\paradigm\paradigm-communicator\src\users.cpp
 	"Users.h"
 
+1562011411 source:c:\paradigm\paracom\paradigm-communicator\main.cpp
+	<iostream>
+	<ctime>
+	<windows.h>
+	<fstream>
+	<vector>
+	<unistd.h>
+	<cstdlib>
+	<Serial.h>
+	<e-mail.h>
+	<tools.h>
+	<fileSystem.h>
+	<users.h>
+
+1561972409 c:\paradigm\paracom\paradigm-communicator\include\serial.h
+	<windows.h>
+	<stdio.h>
+	<stdlib.h>
+	<iostream>
+	<string.h>
+
+1561972409 c:\paradigm\paracom\paradigm-communicator\include\e-mail.h
+	<Serial.h>
+	<vector>
+	<string.h>
+	<iostream>
+	<tools.h>
+	<FileSystemTools.h>
+	<algorithm>
+	<array>
+	<tgmath.h>
+
+1561972409 c:\paradigm\paracom\paradigm-communicator\include\tools.h
+	<iostream>
+	<string.h>
+	<stdio.h>
+	<locale>
+	<fstream>
+
+1559329397 c:\paradigm\paracom\paradigm-communicator\include\filesystemtools.h
+	<iostream>
+	<string.h>
+	<vector>
+	<fstream>
+
+1561972409 c:\paradigm\paracom\paradigm-communicator\include\filesystem.h
+	<iostream>
+	<string.h>
+	<vector>
+	<fstream>
+	<Serial.h>
+	<tools.h>
+	<FileSystemTools.h>
+
+1561972409 c:\paradigm\paracom\paradigm-communicator\include\users.h
+	<tools.h>
+	<Serial.h>
+	<io.h>
+	<fileSystem.h>
+	<fstream>
+	<windows.h>
+
+1561972409 source:c:\paradigm\paracom\paradigm-communicator\src\e-mail.cpp
+	"e-mail.h"
+
+1561972409 source:c:\paradigm\paracom\paradigm-communicator\src\filesystem.cpp
+	"fileSystem.h"
+
+1559329398 source:c:\paradigm\paracom\paradigm-communicator\src\filesystemtools.cpp
+	"FileSystemTools.h"
+
+1561978249 source:c:\paradigm\paracom\paradigm-communicator\src\serial.cpp
+	"Serial.h"
+
+1561977937 source:c:\paradigm\paracom\paradigm-communicator\src\tools.cpp
+	"tools.h"
+
+1561972409 source:c:\paradigm\paracom\paradigm-communicator\src\users.cpp
+	"Users.h"
+
