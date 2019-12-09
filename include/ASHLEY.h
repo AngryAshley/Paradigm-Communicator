@@ -8,7 +8,11 @@
 #include <tools.h>
 #include <Serial.h>
 #include <FileSystemTools.h>
-//#include <thread>
+#include <thread>
+#include <vector>
+#include <conio.h>
+#include <iostream>
+
 
 
 class ASHLEY
@@ -22,13 +26,20 @@ class ASHLEY
         FileSystemTools fstools;
 
         void controlPanel();
+        void tapeLeak();
+        void printCanvas(int i); ///PUT BACK IN PRIVATE AFTER TESTING RADAR
 
     protected:
 
     private:
-        void printBorders();
+
+        void tapeLeakLog();
         bool running = true;
+        bool terminate = false;
         std::string waitForKey();
+        bool waitForMaster();
+        std::vector<std::string> log;
+        int second=0;
 };
 
 #endif // ASHLEY_H

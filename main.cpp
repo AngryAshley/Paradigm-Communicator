@@ -65,6 +65,7 @@ char path_exe_temp[1024];
 GetModuleFileName(NULL, path_exe_temp, 1024);
 int pos=string(path_exe_temp).find_last_of("\\/");
 path_exe=string(path_exe_temp).substr( 0, pos+1);
+tools.pathexe=path_exe_temp;
 }
 
 void loadSettings(){
@@ -197,6 +198,11 @@ int CLI(){
         cmd[1]=tools.to_upper(cmd[1]);
         if(       cmd[1]=="ASHLEY"){
             ashley.controlPanel();
+        } else if(cmd[1]=="TAPE"){
+            ashley.tapeLeak();
+            } else if(cmd[1]=="RADAR"){
+            ashley.printCanvas(2);
+            serial.getKey();
         } else if(cmd[1]=="MELTDOWN"){
             string command = string(path_exe)+string("\\Resources\\meltdown.mp3");
             getPath();

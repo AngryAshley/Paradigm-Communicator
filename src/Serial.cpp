@@ -108,9 +108,7 @@ void SerialPort::print(std::string input){
 
 std::string SerialPort::readLine(int option, int specialChar){
     char buf;
-
     buf = 0;
-    printf("listening\n");
     bool shouldLoop = true;
     bool shouldAdd = true;
     std::string out;

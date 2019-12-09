@@ -21,7 +21,7 @@
 	<iostream>
 	<string.h>
 
-1575886274 source:d:\paradigm\paradigm-communicator\main.cpp
+1575908894 source:d:\paradigm\paradigm-communicator\main.cpp
 	<iostream>
 	<ctime>
 	<windows.h>
@@ -43,7 +43,7 @@
 	<iostream>
 	<string.h>
 
-1562008765 source:d:\paradigm\paradigm-communicator\src\serial.cpp
+1575898079 source:d:\paradigm\paradigm-communicator\src\serial.cpp
 	"Serial.h"
 
 1561203766 source:d:\paradigm\paradigm-communicator\src\e-mail.cpp
@@ -63,7 +63,7 @@
 1575886686 source:d:\paradigm\paradigm-communicator\src\tools.cpp
 	"tools.h"
 
-1561203676 d:\paradigm\paradigm-communicator\include\tools.h
+1575908894 d:\paradigm\paradigm-communicator\include\tools.h
 	<iostream>
 	<string.h>
 	<stdio.h>
@@ -148,10 +148,10 @@
 
 1561275928 D
 
-1575883979 source:d:\paradigm\paradigm-communicator\src\ashley.cpp
+1575909647 source:d:\paradigm\paradigm-communicator\src\ashley.cpp
 	"ASHLEY.h"
 
-1575883963 d:\paradigm\paradigm-communicator\include\ashley.h
+1575908982 d:\paradigm\paradigm-communicator\include\ashley.h
 	<future>
 	<chrono>
 	<windows.h>
@@ -159,6 +159,10 @@
 	<tools.h>
 	<Serial.h>
 	<FileSystemTools.h>
+	<thread>
+	<vector>
+	<conio.h>
+	<iostream>
 
 1561293769 mTools.h>
 
