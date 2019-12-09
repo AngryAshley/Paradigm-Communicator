@@ -24,7 +24,7 @@ void ASHLEY::controlPanel(){
     //handle = CreateThread(NULL, 0, thread, 0, 0, 0);
 
     /*
-        std::future<int> fut = std::async(this->waitForKey);
+    std::future<std::string> fut=std::async(std::launch::async, &ASHLEY::waitForKey, this);
     while(running){
 
 
@@ -40,10 +40,16 @@ void ASHLEY::controlPanel(){
 
 
     }
-*/
+    */
+    //std::thread key(waitForKey());
+    while(running){
 
 
 
+
+
+
+    }
 return;
 }
 
@@ -55,9 +61,9 @@ serial.print("         __               __                                   ");
 serial.print("    /|  /     |  |  |    |    \\  /                             ");
 serial.print("   / |  \\__   |__|  |    |__   \\/                              ");
 serial.print("  /__|     \\  |  |  |    |     /                              ");
-serial.print(" /   |   __/  |  |  |__  |__   /    C o n t r o l   p a n e l ");
+serial.print(" /   |   __/  |  |  |__  |__  /    C o n t r o l   p a n e l ");
 serial.print("");
-serial.print("ีอ Status อออออออออออออออออออออธ");
+serial.print("ฺอ Status อออออออออออออออออออออฟ");
 serial.print("ณ                              ณ");
 serial.print("ณ   CPU:                       ณ");
 serial.print("ณ                              ณ");

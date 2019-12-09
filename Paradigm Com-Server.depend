@@ -21,13 +21,14 @@
 	<iostream>
 	<string.h>
 
-1561286213 source:d:\paradigm\paradigm-communicator\main.cpp
+1575886274 source:d:\paradigm\paradigm-communicator\main.cpp
 	<iostream>
 	<ctime>
 	<windows.h>
 	<fstream>
 	<vector>
 	<unistd.h>
+	<cstdlib>
 	<Serial.h>
 	<e-mail.h>
 	<tools.h>
@@ -35,20 +36,20 @@
 	<users.h>
 	<ASHLEY.h>
 
-1561231915 d:\paradigm\paradigm-communicator\include\serial.h
+1561228315 d:\paradigm\paradigm-communicator\include\serial.h
 	<windows.h>
 	<stdio.h>
 	<stdlib.h>
 	<iostream>
 	<string.h>
 
-1561284556 source:d:\paradigm\paradigm-communicator\src\serial.cpp
+1562008765 source:d:\paradigm\paradigm-communicator\src\serial.cpp
 	"Serial.h"
 
-1561207366 source:d:\paradigm\paradigm-communicator\src\e-mail.cpp
+1561203766 source:d:\paradigm\paradigm-communicator\src\e-mail.cpp
 	"e-mail.h"
 
-1561197923 d:\paradigm\paradigm-communicator\include\e-mail.h
+1561194323 d:\paradigm\paradigm-communicator\include\e-mail.h
 	<Serial.h>
 	<vector>
 	<string.h>
@@ -59,23 +60,23 @@
 	<array>
 	<tgmath.h>
 
-1561211137 source:d:\paradigm\paradigm-communicator\src\tools.cpp
+1575886686 source:d:\paradigm\paradigm-communicator\src\tools.cpp
 	"tools.h"
 
-1561207276 d:\paradigm\paradigm-communicator\include\tools.h
+1561203676 d:\paradigm\paradigm-communicator\include\tools.h
 	<iostream>
 	<string.h>
 	<stdio.h>
 	<locale>
 	<fstream>
 
-1548504010 d:\paradigm\paradigm-communicator\include\filesystemtools.h
+1548500410 d:\paradigm\paradigm-communicator\include\filesystemtools.h
 	<iostream>
 	<string.h>
 	<vector>
 	<fstream>
 
-1548504020 source:d:\paradigm\paradigm-communicator\src\filesystemtools.cpp
+1548500420 source:d:\paradigm\paradigm-communicator\src\filesystemtools.cpp
 	"FileSystemTools.h"
 
 1559643920 d:\paradigm\paradigmcom-server\include\e-mail.h
@@ -122,7 +123,7 @@
 1559906781 source:d:\paradigm\paradigmcom-server\src\filesystem.cpp
 	"fileSystem.h"
 
-1561275952 d:\paradigm\paradigm-communicator\include\filesystem.h
+1561272352 d:\paradigm\paradigm-communicator\include\filesystem.h
 	<iostream>
 	<string.h>
 	<vector>
@@ -131,10 +132,10 @@
 	<tools.h>
 	<FileSystemTools.h>
 
-1561281664 source:d:\paradigm\paradigm-communicator\src\filesystem.cpp
+1561278064 source:d:\paradigm\paradigm-communicator\src\filesystem.cpp
 	"fileSystem.h"
 
-1561240393 d:\paradigm\paradigm-communicator\include\users.h
+1561236793 d:\paradigm\paradigm-communicator\include\users.h
 	<tools.h>
 	<Serial.h>
 	<io.h>
@@ -142,14 +143,15 @@
 	<fstream>
 	<windows.h>
 
-1561275928 source:d:\paradigm\paradigm-communicator\src\users.cpp
+1561272328 source:d:\paradigm\paradigm-communicator\src\users.cpp
 	"Users.h"
 
-<<<<<<< HEAD
-1561286201 source:d:\paradigm\paradigm-communicator\src\ashley.cpp
+1561275928 D
+
+1575883979 source:d:\paradigm\paradigm-communicator\src\ashley.cpp
 	"ASHLEY.h"
 
-1561293769 d:\paradigm\paradigm-communicator\include\ashley.h
+1575883963 d:\paradigm\paradigm-communicator\include\ashley.h
 	<future>
 	<chrono>
 	<windows.h>
@@ -158,7 +160,8 @@
 	<Serial.h>
 	<FileSystemTools.h>
 
-=======
+1561293769 mTools.h>
+
 1562011411 source:c:\paradigm\paracom\paradigm-communicator\main.cpp
 	<iostream>
 	<ctime>
@@ -239,4 +242,31 @@
 1561972409 source:c:\paradigm\paracom\paradigm-communicator\src\users.cpp
 	"Users.h"
 
->>>>>>> 6713d25fc817db9e25e4133071736194d09ba108
+1561972409 3d25fc817db9e25e4133071736194d09ba108
+
+1575882442 d:\paradigm\paradigm-communicator\include\mingw.thread.h
+	<thread>
+	<cstddef>
+	<cerrno>
+	<exception>
+	<system_error>
+	<functional>
+	<tuple>
+	<chrono>
+	<memory>
+	<iosfwd>
+	<utility>
+	"mingw.invoke.h"
+	<windows.h>
+	<synchapi.h>
+	<handleapi.h>
+	<sysinfoapi.h>
+	<processthreadsapi.h>
+	<process.h>
+	<cstdio>
+
+1575882300 d:\paradigm\paradigm-communicator\include\mingw.invoke.h
+	<type_traits>
+	<utility>
+	<functional>
+

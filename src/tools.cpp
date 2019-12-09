@@ -34,9 +34,9 @@ std::string Tools::setting_read(std::string setting, std::string path){
         return "NOT_FOUND";
 	} else {
 	    std::cout<<"ERROR: Couldn't open file "<<fullPath<<", "<<strerror(errno)<<std::endl;
-        return "FILE_NOT_FOUND";
 	}
     file.close();
+    return "FILE_NOT_FOUND";
 }
 
 

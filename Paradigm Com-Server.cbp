@@ -37,8 +37,10 @@
 		<Unit filename="include/ASHLEY.h" />
 		<Unit filename="include/FileSystemTools.h" />
 		<Unit filename="include/Serial.h" />
+		<Unit filename="include/cpipe.h" />
 		<Unit filename="include/e-mail.h" />
 		<Unit filename="include/fileSystem.h" />
+		<Unit filename="include/spawn.h" />
 		<Unit filename="include/tools.h" />
 		<Unit filename="include/users.h" />
 		<Unit filename="main.cpp" />

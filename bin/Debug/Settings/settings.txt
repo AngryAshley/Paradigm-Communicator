@@ -1,6 +1,7 @@
 sys_os=win
-ser_port=6
+ser_port=3
 msg_MOTD=
+AshleyMode=0
 
 //Title has a default value, called with "*" 
 msg_title=*

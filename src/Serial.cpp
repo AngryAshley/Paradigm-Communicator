@@ -108,12 +108,15 @@ void SerialPort::print(std::string input){
 
 std::string SerialPort::readLine(int option, int specialChar){
     char* buf;
+
     *buf = NULL;
+    printf("listening\n");
     bool shouldLoop = true;
     bool shouldAdd = true;
     std::string out;
     std::string in ="";
     int amount = 0;
+
     while(shouldLoop){
         bool shouldPrint = true;
         bool shouldAdd = true;

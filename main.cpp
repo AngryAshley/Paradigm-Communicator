@@ -14,6 +14,8 @@
 #include <ASHLEY.h>
 
 
+
+
 using namespace std;
 
 /// Program specific variables ///
@@ -81,6 +83,7 @@ void loadSettings(){
         port_name="COM"+tools.setting_read("ser_port", "\\Settings\\settings.txt");
         printf("Port is %s\n",port_name.c_str());
     }
+    ASHLEYmode=atoi(tools.setting_read("AshleyMode", "\\Settings\\settings.txt").c_str());
     printf("Done loading settings\n");
 };
 
@@ -165,17 +168,13 @@ int CLI(){
         } else {
             serial.write("File "+cmd[1]+" not found");
         }
-
-    } else if(cmd[0]=="LOCKDOWN"){
-        string command = string(path_exe)+string("\\Resources\\meltdown.mp3");
-        getPath();
-        fs.printBigFile(string(path_exe)+string("Resources\\meltdown.txt"));
-        system(command.c_str());
-        serial.getKey();
-        serial.write("\e[0m"+misc_defColor+"\e[2J");
-
     } else if(cmd[0]=="HELP"){
         fs.printBigFile(string(path_exe)+string("\\Settings\\help.txt"));
+
+    } else if(cmd[0]=="RUN"){
+
+        /// implementeer iets leuks met spawn, gebruik async voor full-duplex pipeline wat erg belangrijk is
+
 
     } else if(cmd[0]=="USER"){
         cmd[1]=tools.to_upper(cmd[1]);
@@ -194,9 +193,20 @@ int CLI(){
         } else {
             serial.print("Bad parameter - "+cmd[1]+"\r\n");
         }
-    } else if(cmd[0]=="ASHLEY"){
-        ashley.controlPanel();
-
+    } else if(cmd[0]=="HWOOD"){
+        cmd[1]=tools.to_upper(cmd[1]);
+        if(       cmd[1]=="ASHLEY"){
+            ashley.controlPanel();
+        } else if(cmd[1]=="MELTDOWN"){
+            string command = string(path_exe)+string("\\Resources\\meltdown.mp3");
+            getPath();
+            fs.printBigFile(string(path_exe)+string("Resources\\meltdown.txt"));
+            system(command.c_str());
+            serial.getKey();
+            serial.write("\e[0m"+misc_defColor+"\e[2J");
+        } else {
+        serial.print("No hollywood scene found for "+cmd[1]);
+        }
 
     } else {
         serial.write("Bad command - "+cmd[0]+"\r\n");
@@ -250,8 +260,9 @@ int login(){
 }
 
 int ashleyBoot(){
-    int timer = 11; ///Timeout
-    //timer =(rand() % 10) + 1; ///Random Generator
+    int timer =(rand() % 10) + 1; ///Random Generator
+    timer = 11; ///Uncomment if timeout
+
 
     serial.write("\e[0m"+misc_color+"\e[2J\e[0;0H");
     serial.getKey();
