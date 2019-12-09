@@ -107,9 +107,9 @@ void SerialPort::print(std::string input){
 }
 
 std::string SerialPort::readLine(int option, int specialChar){
-    char* buf;
+    char buf;
 
-    *buf = NULL;
+    buf = 0;
     printf("listening\n");
     bool shouldLoop = true;
     bool shouldAdd = true;
@@ -123,12 +123,12 @@ std::string SerialPort::readLine(int option, int specialChar){
         //this->readSerialPort(buf,1);
         in = this->getKey();
         if(in.size()<2){
-            *buf = in.c_str()[0];
-        switch(*buf){
+            buf = in.c_str()[0];
+        switch(buf){
 
             case '\r': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
             case '\n': this->writeSerialPort("\r\n",2); shouldLoop=false; break;
-            case NULL: shouldPrint=false; break;
+            case 0: shouldPrint=false; break;
             case '\x7F':
             case '\x08': if(amount>0){
                             out = out.std::string::substr(0, out.std::string::size()-1);
@@ -136,7 +136,7 @@ std::string SerialPort::readLine(int option, int specialChar){
                             amount--;
                          }
                          if(option==2)break;
-                         *buf = NULL;
+                         buf = 0;
                          shouldPrint=false;
                          shouldAdd=false;
                          break;
@@ -147,22 +147,24 @@ std::string SerialPort::readLine(int option, int specialChar){
             if(shouldPrint)this->write(in);
             //return "";
         }
-        if(*buf!=NULL)printf("%02X", *buf);
+        if(buf!=0)printf("%02X", buf);
         if(shouldPrint && shouldLoop){
             if(shouldAdd){
-                out += *buf;
+                out += buf;
                 amount++;
             } else {
                 if(amount>0){
                     amount--;
                 }
             }
+            char retBuf[1];
+            retBuf[0]=buf;
             switch(option){
-            case 0: this->writeSerialPort(buf,1); break;
+            case 0: this->writeSerialPort(retBuf,1); break;
             case 1: this->writeSerialPort("*",1); break;
             case 2: this->writeSerialPort(" \x08",2); break;
             }
-            *buf=NULL;
+            buf=0;
         };
     }
 
