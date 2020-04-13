@@ -8,6 +8,7 @@
 #include <Serial.h>
 #include <tools.h>
 #include <FileSystemTools.h>
+#include <serialTools.h>
 
 class fileSystem
 {
@@ -17,6 +18,7 @@ class fileSystem
 
         SerialPort serial;
         FileSystemTools fst;
+        serialTools stools;
 
         void showDir();
         void changeDir(std::string dir);
@@ -28,12 +30,16 @@ class fileSystem
         int DeleteDirectory(const std::string &refcstrRootDirectory, bool bDeleteSubdirectories = true);
         void hideFile(const std::string& fileName);
 
+        int fileEditor(std::string path);
+
         std::string defColor;
         std::string cd;
 
     private:
         std::string key;
         std::vector<int> findLocation(std::string sample, char findIt);
+        int fileEditor_drawMenu(int mode=0,int select1=0,int select2=0);
+        std::string fe_currentFile;
 };
 
 #endif // FILESYSTEM_H

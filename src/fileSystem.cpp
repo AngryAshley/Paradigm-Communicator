@@ -229,3 +229,176 @@ int fileSystem::DeleteDirectory(const std::string &refcstrRootDirectory, bool bD
 
   return 0;
 }
+int fileSystem::fileEditor_drawMenu(int mode, int select1, int select2){
+    if(mode==0){
+        serial.write("\e[2J"+defColor+"\e[0;0H");
+        serial.print("\e[7m\e[K\e["+std::to_string(40-(fe_currentFile.std::string::size()/2))+"C"+fe_currentFile);
+        serial.write("\e[K   File      Settings ");
+        serial.write("\e[24;0H\e[K Press F1 for menu\e[2;0H\e[0m"+this->defColor);
+        return 0;
+    }
+    if(mode==1){
+        //serial.write("\e[3;0H\e[K\n\e[K\n\e[K\n\e[K\n\e[K\n\e[K\n\e[K");
+        serial.write("\e[2;0H");
+        switch(select1){
+            case 0:
+                serial.write("\e[46m  >File<  "+this->defColor+"\e[7m   Settings \e[0m"+this->defColor);
+                serial.write("\e[3;1H\e[47m  New     \e[40m \n");
+                serial.write("\e[4;1H\e[47m  Save    \e[40m \n");
+                serial.write("\e[5;1H\e[47m  print   \e[40m \n");
+                serial.write("\e[6;1H\e[47m  Dwnload \e[40m \n");
+                serial.write("\e[7;1H\e[47m  Exit    \e[40m \n");
+                serial.write("\e[8;2H\e[40m          ");
+                switch(select2){
+                    case 0: serial.write("\e[3;1H\e[1;33;47m> New     \e[1;34;40m \n"); break;
+                    case 1: serial.write("\e[4;1H\e[1;33;47m> Save    \e[1;34;40m \n"); break;
+                    case 2: serial.write("\e[5;1H\e[1;33;47m> print   \e[1;34;40m \n"); break;
+                    case 3: serial.write("\e[6;1H\e[1;33;47m> Dwnload \e[1;34;40m \n"); break;
+                    case 4: serial.write("\e[7;1H\e[1;33;47m> Exit    \e[1;34;40m \n"); break;
+                }
+                break;
+            case 1:
+                serial.write(this->defColor+"\e[7m   File   \e[0m"+this->defColor+"\e[46m  >Settings<  \e[0m"+this->defColor);
+                serial.write("\e[3;11H\e[47m  Null    \e[40m \n");
+                serial.write("\e[4;11H\e[47m  Null    \e[40m \n");
+                serial.write("\e[5;11H\e[47m  Null    \e[40m \n");
+                serial.write("\e[6;11H\e[47m  Null    \e[40m \n");
+                serial.write("\e[7;11H\e[47m  Null    \e[40m \n");
+                serial.write("\e[8;11H\e[47m  Null    \e[40m \n");
+                serial.write("\e[9;12H\e[40m          ");
+                switch(select2){
+                    case 0: serial.write("\e[3;11H\e[1;33;47m> Null    \e[1;34;40m \n"); break;
+                    case 1: serial.write("\e[4;11H\e[1;33;47m> Null    \e[1;34;40m \n"); break;
+                    case 2: serial.write("\e[5;11H\e[1;33;47m> Null    \e[1;34;40m \n"); break;
+                    case 3: serial.write("\e[6;11H\e[1;33;47m> Null    \e[1;34;40m \n"); break;
+                    case 4: serial.write("\e[7;11H\e[1;33;47m> Null    \e[1;34;40m \n"); break;
+                    case 5: serial.write("\e[8;11H\e[1;33;47m> Null    \e[1;34;40m \n"); break;
+                }
+                break;
+        }
+        return 0;
+    }
+    if(mode==2){
+        switch(select1){
+            case 0: return 4;
+            case 1: return 5;
+        }
+    }
+}
+
+int fileSystem::fileEditor(std::string path){
+    stools.serial = serial;
+    std::vector<std::string> file;
+    int curLine=0;
+    int curCol=0;
+    char currentLine[80];
+    bool inMenu = false;
+    int sel1=0;
+    int sel2=0;
+    bool editing=true;
+
+    if(this->fileExists(cd+"\\"+path)==false || path=="new"){
+            serial.print("File Editor:");
+        if(stools.choice(path+" doesn't exist, create new file?")==1){return 0;};
+        this->fe_currentFile="New.file";
+    } else {
+        this->fe_currentFile=path;
+    }
+    this->fileEditor_drawMenu();
+    if(fe_currentFile!="New.file"){  ///load file if file not new(aka no file to read);
+       file = fst.file_getAll(cd+fe_currentFile);
+    }
+    int fileLen=file.size();
+    int maxLines=21;
+    if(fileLen<maxLines)maxLines=fileLen;
+    strcpy(currentLine,file[curLine].c_str());
+    serial.write("\e[3;0H");
+    for(int i=0; i<maxLines; i++){
+        serial.write(file[i]);
+        serial.write("\e["+std::to_string(4+i)+";0H");
+    }
+
+    while(editing){
+        serial.write("\e["+std::to_string(curLine+3)+";"+std::to_string(curCol)+"H");
+        std::string key = serial.getKey();
+        if(key.std::string::size()>1 || key=="\x0d" || key=="\x08"||key=="\x1b"){
+            if(key=="\x0d"){
+                currentLine[curCol]=key[0];
+                file[curLine]=currentLine;
+                curCol++;
+                curLine++;
+                strcpy(currentLine,file[curLine].c_str());
+
+            }
+            if(key=="\x08"){
+                file[curLine].std::string::erase(curCol,1);
+            }
+            if(key=="\e[A"){   ///keys in sequence UP DOWN RIGHT LEFT
+                if(curLine!=0){
+                    curLine--;
+                    strcpy(currentLine,file[curLine].c_str());
+                }
+            }
+            if(key=="\e[B"){
+                if(curLine!=21){
+                    curLine++;
+                    strcpy(currentLine,file[curLine].c_str());
+                }
+            }
+            if(key=="\e[C"){
+                if(curCol!=79){curCol++;}
+            }
+            if(key=="\e[D"){
+                if(curCol!=0){curCol--;}
+            }
+            if(key=="\eOP"){
+                inMenu=true;
+                sel1=0;
+                sel2=0;
+                while(inMenu){
+                    this->fileEditor_drawMenu(1,sel1,sel2);
+                    std::string key = serial.getKey();
+                    printf("%s",key);
+                    if(key.std::string::size()>1 || key=="\x0d" || key=="\x08"||key=="\x1b"){
+                        if(key=="\e[A"){   ///keys in sequence UP DOWN RIGHT LEFT
+                            if(sel2!=0){sel2--;}
+                        }
+                        if(key=="\e[B"){
+                            if(sel2!=fileEditor_drawMenu(2,sel1)){sel2++;}
+                        }
+                        if(key=="\e[C"){
+                            if(sel1!=1){sel1++;}
+                        }
+                        if(key=="\e[D"){
+                            if(sel1!=0){sel1--;}
+                        }
+                        if(key=="\eOP"){
+                            inMenu=false;
+                            serial.write("\e[0m"+this->defColor);
+                            fileEditor_drawMenu(0);
+                        }
+                        if(key=="\x0d"){
+                                printf("Selected option %d, %d",sel1, sel2);
+                            switch(sel1){
+                                case 0: switch(sel2){
+                                            case 4: editing=false; inMenu=false; serial.write(this->defColor+"\e[2J\e[0;0H"); return 1;
+
+
+                                            }
+                                            break;
+
+
+                            }
+                        }
+                    } else {
+                        switch(key[0]){}
+                    }
+                }
+            }
+        } else {
+            currentLine[curCol]=key[0];
+            curCol++;
+        }
+        serial.write("\e["+std::to_string(curLine+3)+";0H"+currentLine);
+    }
+}

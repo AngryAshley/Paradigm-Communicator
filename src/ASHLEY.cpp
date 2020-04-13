@@ -153,7 +153,7 @@ void ASHLEY::printCanvas(int i){
         serial.print("ภฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤู");
         break;
         case 1:    ///11111111111111111111111111111111111111112222222222222222222222222222222222222222
-        serial.print("\e[44m\e[1;37m\e[2J\e[1;1Hฺอ SCS Control panel ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออฟ");
+        serial.print("\e[44m\e[1;37m\e[2J\e[1;1Hฺอ SCS Control panel อออออออออออออออออออออออออออออออออออออออออออออออออออออออออฟ");
         serial.print("ณ\e[2;80Hณ");
         serial.print("รฤ Agents ฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤด");
         serial.print("ณ Name   Status  Position ณ Name   Status  Position ณ Name   Status  Position  ณ");

@@ -40,6 +40,8 @@
 		<Unit filename="include/cpipe.h" />
 		<Unit filename="include/e-mail.h" />
 		<Unit filename="include/fileSystem.h" />
+		<Unit filename="include/pstream.h" />
+		<Unit filename="include/serialTools.h" />
 		<Unit filename="include/spawn.h" />
 		<Unit filename="include/tools.h" />
 		<Unit filename="include/users.h" />
@@ -49,6 +51,7 @@
 		<Unit filename="src/Serial.cpp" />
 		<Unit filename="src/e-mail.cpp" />
 		<Unit filename="src/fileSystem.cpp" />
+		<Unit filename="src/serialTools.cpp" />
 		<Unit filename="src/tools.cpp" />
 		<Unit filename="src/users.cpp" />
 		<Extensions>

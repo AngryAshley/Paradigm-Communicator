@@ -194,6 +194,8 @@ int CLI(){
         } else {
             serial.print("Bad parameter - "+cmd[1]+"\r\n");
         }
+    } else if(cmd[0]=="EDIT"){
+        fs.fileEditor(cmd[1]);
     } else if(cmd[0]=="HWOOD"){
         cmd[1]=tools.to_upper(cmd[1]);
         if(       cmd[1]=="ASHLEY"){
