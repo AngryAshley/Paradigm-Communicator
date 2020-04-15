@@ -21,9 +21,14 @@ using namespace std;
 /// Program specific variables ///
 char incomingData[MAX_DATA_LENGTH];
 int serialBaud = 6.666666;
-string PCS_ver="0.1.0 A";
+string PCS_ver="1.0.0 A";
 string path_exe="";
 bool ASHLEYmode=false;
+
+/// Debugging variables ///
+bool autoLogin=false;
+string autoLoginName = "meep";
+string autoLoginPass = "poop";
 
 typedef vector<string> strvec;
 
@@ -313,6 +318,7 @@ int ashleyBoot(){
 }
 
 void loginPrompt(){
+    if(!autoLogin){
     serial.write("\e[0m"+misc_color+"\e[2J\e[0;0H");
     serial.print("Paradigm Communicator " + PCS_ver);
     serial.print("The date is "+tools.date()+"\r\n");
@@ -333,6 +339,12 @@ void loginPrompt(){
         } else {
             printf(" error %i ",ret);
         }
+    }
+    } else {
+        serial.print(misc_defColor+"\e[2JAuto-logged in>\n");
+        uname=autoLoginName;
+        passwd=autoLoginPass;
+        CLI();
     }
 }
 

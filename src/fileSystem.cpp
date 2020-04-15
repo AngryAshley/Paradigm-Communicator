@@ -15,7 +15,7 @@ void fileSystem::showDir(){
     std::string path;
     int filesFound = 0;
     pattern.append("\\*");
-    FILETIME ft;
+    //FILETIME ft;
     WIN32_FIND_DATA data;
     HANDLE hFind;
     if ((hFind = FindFirstFile(pattern.c_str(), &data)) != INVALID_HANDLE_VALUE) {
@@ -264,7 +264,7 @@ void fileSystem::db(std::string dbID, int clearance){
     int j=1;
     dataLengths[0]=delim;
     serial.print(defColor+"\e[47m\e[1;34m\e[KDatabase - "+dbID+defColor);
-    serial.write("\e[24;0H\e[47m\e[1;34m\e[K E Exit | S Sort | F Filter | M Modify | D Delete | N New | v Next | ^ Previous |"+defColor);
+    serial.write("\e[24;0H\e[47m\e[1;34m\e[K E Exit | S Sort | F Filter | M Modify | D Delete | N New | v Next | ^ Prev. |"+defColor);
     for(int i=0;i<mdataLen;i++){
      if(metadata[i][0]=='#'){
         i++;
@@ -277,7 +277,7 @@ void fileSystem::db(std::string dbID, int clearance){
      j++;
      i++;
     }
-    serial.print("\n\r-------------------------------------------------------------------------------");
+    serial.print("\n\r컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴�");
     std::string currentLine = "";
     std::string currentLineS[16];
     int nextLine=1;
