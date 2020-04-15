@@ -215,7 +215,13 @@ int CLI(){
         } else {
         serial.print("No hollywood scene found for "+cmd[1]);
         }
+    } else if(cmd[0]=="DB"){
+        if(cmd[1]!=""){
 
+            fs.db(cmd[1],atoi(tools.setting_read("authLevel", "\\Users\\"+uname+"\\settings.txt").c_str()));
+        } else {
+            serial.print("Please specify database");
+        }
     } else {
         serial.write("Bad command - "+cmd[0]+"\r\n");
     };

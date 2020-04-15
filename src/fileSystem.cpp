@@ -229,6 +229,135 @@ int fileSystem::DeleteDirectory(const std::string &refcstrRootDirectory, bool bD
 
   return 0;
 }
+
+void fileSystem::db(std::string dbID, int clearance){
+    std::string path = fileSystem::getPath();
+    if(!fileSystem::fileExists(path+"\\DB\\"+dbID+".TXT")){
+        serial.print(" - Database \""+dbID+"\" not found.");
+        return;
+    }
+    std::string metadataTemp = fst.file_getLine(path+"\\DB\\"+dbID+".TXT",0);
+    std::string metadata[32];
+    int dataLengths[16];
+    int mdataLen=0;
+    int dbClearance = 0;
+    tools.splitString(metadataTemp,metadata,".|");
+    for(int i=0; i<32; i++){
+        if(metadata[i]=="#CLEVEL"){
+            dbClearance=atoi(metadata[i+1].c_str());
+            break;
+        }
+    }
+    if(clearance<dbClearance){
+        serial.print(" - You are not authorized to access this database.");
+        return;
+    }
+    for(int i=0;i<32;i++){
+        if(metadata[i]==""){
+            mdataLen=i;
+            break;
+        }
+    }
+
+    serial.write("\e[2J\e[0;0H");
+    int delim=1;
+    int j=1;
+    dataLengths[0]=delim;
+    serial.print(defColor+"\e[47m\e[1;34m\e[KDatabase - "+dbID+defColor);
+    serial.write("\e[24;0H\e[47m\e[1;34m\e[K E Exit | S Sort | F Filter | M Modify | D Delete | N New | v Next | ^ Previous |"+defColor);
+    for(int i=0;i<mdataLen;i++){
+     if(metadata[i][0]=='#'){
+        i++;
+        continue;
+     }
+
+     serial.write("\e[2;"+std::to_string(delim)+"H"+metadata[i]);
+     delim+=atoi(metadata[i+1].c_str())+1;
+     dataLengths[j]=delim;
+     j++;
+     i++;
+    }
+    serial.print("\n\r-------------------------------------------------------------------------------");
+    std::string currentLine = "";
+    std::string currentLineS[16];
+    int nextLine=1;
+    int offset=0;
+    int selected=0;
+    int selectPos=0;
+    int filtered=0;
+    std::string key="";
+    std::vector<std::string> file;
+    file = fst.file_getAll(path+"\\DB\\"+dbID+".TXT");
+    while(true){
+        nextLine=1;
+        while(true){
+            currentLine=fst.file_getLine(path+"\\DB\\"+dbID+".TXT",nextLine+offset);
+            if(currentLine!=""){
+                tools.splitString(currentLine,currentLineS,"|");
+                if((nextLine-1)+offset==selected){
+                    serial.write("\e["+std::to_string(nextLine+3)+";0H");
+                    serial.write("\e[47m\e[1;34m\e[K");
+                } else {
+                    serial.write("\e["+std::to_string(nextLine+3)+";0H");
+                    serial.write(defColor+"\e[K");
+                }
+
+                for(int k=0;k<j;k++){
+                    serial.write("\e["+std::to_string(nextLine+3)+";"+std::to_string(dataLengths[k])+"H"+currentLineS[k]);
+                }
+                serial.write(defColor);
+            } else {
+                break;
+            }
+            nextLine++;
+            if(nextLine==21){
+                break;
+            }
+        }
+        key = serial.getKey();
+
+        if(key=="e"){
+            serial.write(defColor+"\e[2J\e[0;0H");
+            break;
+        }
+        if(key=="\e[A"){
+            if(selectPos==0&&selected>0){
+                offset--;
+            }
+            if(selected>0){
+                selected--;
+                if(selectPos>0){
+                    selectPos--;
+                }
+            } else {
+                if(offset>0){
+                    offset--;
+                    selected--;
+                }
+            }
+        }
+        if(key=="\e[B"){
+            if(selected+offset<=file.size()){
+                if(selectPos==19){
+                    offset++;
+                    selected++;
+                } else {
+                    if(selectPos<19){
+                        selectPos++;
+                    }
+                    selected++;
+                }
+            }
+        }
+
+    }
+
+
+
+
+    return;
+}
+
 int fileSystem::fileEditor_drawMenu(int mode, int select1, int select2){
     if(mode==0){
         serial.write("\e[2J"+defColor+"\e[0;0H");

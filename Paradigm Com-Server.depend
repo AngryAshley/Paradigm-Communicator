@@ -167,7 +167,7 @@
 
 1561293769 mTools.h>
 
-1562011411 source:c:\paradigm\paracom\paradigm-communicator\main.cpp
+1586786813 source:c:\paradigm\paracom\paradigm-communicator\main.cpp
 	<iostream>
 	<ctime>
 	<windows.h>
@@ -180,6 +180,7 @@
 	<tools.h>
 	<fileSystem.h>
 	<users.h>
+	<ASHLEY.h>
 
 1561972409 c:\paradigm\paracom\paradigm-communicator\include\serial.h
 	<windows.h>
@@ -212,7 +213,7 @@
 	<vector>
 	<fstream>
 
-1561972409 c:\paradigm\paracom\paradigm-communicator\include\filesystem.h
+1586792644 c:\paradigm\paracom\paradigm-communicator\include\filesystem.h
 	<iostream>
 	<string.h>
 	<vector>
@@ -220,6 +221,7 @@
 	<Serial.h>
 	<tools.h>
 	<FileSystemTools.h>
+	<serialTools.h>
 
 1561972409 c:\paradigm\paracom\paradigm-communicator\include\users.h
 	<tools.h>
@@ -232,16 +234,16 @@
 1561972409 source:c:\paradigm\paracom\paradigm-communicator\src\e-mail.cpp
 	"e-mail.h"
 
-1561972409 source:c:\paradigm\paracom\paradigm-communicator\src\filesystem.cpp
+1586779128 source:c:\paradigm\paracom\paradigm-communicator\src\filesystem.cpp
 	"fileSystem.h"
 
 1559329398 source:c:\paradigm\paracom\paradigm-communicator\src\filesystemtools.cpp
 	"FileSystemTools.h"
 
-1561978249 source:c:\paradigm\paracom\paradigm-communicator\src\serial.cpp
+1586883399 source:c:\paradigm\paracom\paradigm-communicator\src\serial.cpp
 	"Serial.h"
 
-1561977937 source:c:\paradigm\paracom\paradigm-communicator\src\tools.cpp
+1586779128 source:c:\paradigm\paracom\paradigm-communicator\src\tools.cpp
 	"tools.h"
 
 1561972409 source:c:\paradigm\paracom\paradigm-communicator\src\users.cpp
@@ -282,4 +284,28 @@
 	<Serial.h>
 	<iostream>
 	<string>
+
+1586779128 c:\paradigm\paracom\paradigm-communicator\include\serialtools.h
+	<Serial.h>
+	<iostream>
+	<string>
+
+1586779128 c:\paradigm\paracom\paradigm-communicator\include\ashley.h
+	<future>
+	<chrono>
+	<windows.h>
+	<signal.h>
+	<tools.h>
+	<Serial.h>
+	<FileSystemTools.h>
+	<thread>
+	<vector>
+	<conio.h>
+	<iostream>
+
+1586779128 source:c:\paradigm\paracom\paradigm-communicator\src\ashley.cpp
+	"ASHLEY.h"
+
+1586779128 source:c:\paradigm\paracom\paradigm-communicator\src\serialtools.cpp
+	"serialTools.h"
 
