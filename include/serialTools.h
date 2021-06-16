@@ -14,6 +14,9 @@ class serialTools
 
         SerialPort serial;
         int choice(std::string prompt, std::string choices="yn");
+        std::string getError(int type);
+        void throwError(int type, std::string info="");
+        void closeConn(std::string msg = "NONE");
 
 
     protected:

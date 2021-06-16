@@ -1,2 +1,3 @@
 password=numbercruncher
-authLevel=1
+authLevel=9
+archival=0

@@ -34,3 +34,24 @@ std::vector<std::string> FileSystemTools::file_getAll(std::string path){
     }
     return contents;
 }
+
+int FileSystemTools::file_writeAll(std::string path, std::vector<std::string> contents, bool truncate){
+    std::ofstream file;
+    if(truncate){
+        file.open(path,std::ofstream::trunc);
+    } else {
+        file.open(path);
+    }
+    for(std::string s:contents){
+        file << s << '\n';
+    }
+    file.close();
+    return 1;
+}
+
+void FileSystemTools::file_append(std::string path, std::string contents){
+    std::ofstream file;
+    file.open(path,std::ofstream::app);
+    file << contents << '\n';
+    file.close();
+}

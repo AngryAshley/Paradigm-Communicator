@@ -1,2 +1,3 @@
 password=poop
-authLevel=10
+authLevel=0
+archival=1

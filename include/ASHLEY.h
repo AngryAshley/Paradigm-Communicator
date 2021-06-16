@@ -25,6 +25,7 @@ class ASHLEY
         Tools tools;
         FileSystemTools fstools;
 
+        int ashleyBoot();
         void controlPanel();
         void tapeLeak();
         void printCanvas(int i); ///PUT BACK IN PRIVATE AFTER TESTING RADAR

@@ -10,7 +10,7 @@ Users::~Users()
     //dtor
 }
 
-int Users::auth(std::string user){  /// 0 is guest, 10 is absolute admin
+int Users::auth(std::string user){  /// 10 is guest, 0 is absolute admin
     std::string val = tools.setting_read("authLevel", "\\Users\\"+user+"\\settings.txt");
     if(val=="NOT_FOUND"){val="0";};
     return std::atoi(val.c_str());

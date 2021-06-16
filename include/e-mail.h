@@ -6,6 +6,7 @@
 #include <string.h>
 #include <iostream>
 #include <tools.h>
+#include <fileSystem.h>
 #include <FileSystemTools.h>
 #include <algorithm>
 #include <array>
@@ -14,6 +15,7 @@
 class e_mail{
     Tools tools;
     FileSystemTools fstools;
+
 
     public:
         e_mail();
@@ -25,11 +27,12 @@ class e_mail{
         std::string defColor;
         SerialPort serial;
 
-        void getNewMail();
+        int getNewMail(bool verbose=true);
         void help();
         void inbox();
         int inbox_drawContent(std::string path, int page);
 
+        fileSystem fs;
     private:
 
         std::string username;
@@ -37,6 +40,7 @@ class e_mail{
 
         int inbox_drawMail(int index, int page);
         void mail_sort();
+        void refreshMailFolder();
 
         void inbox_clearWindow();
         void inbox_openMail(int index);

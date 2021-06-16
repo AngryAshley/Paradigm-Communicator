@@ -8,21 +8,29 @@ e_mail::e_mail(){
 e_mail::~e_mail(){
 }
 
+void e_mail::refreshMailFolder(){
+    mailFolder.clear();
+    fs.read_dir_vect(path,mailFolder);
+}
+
 void e_mail::reset(){
     mailFolder.clear();
     path="";
 }
 
-void e_mail::getNewMail(){
+int e_mail::getNewMail(bool verbose){
     std::string split[2];
     int amount = 0;
 
+    refreshMailFolder();
+
     for(std::vector<int>::size_type i = 0; i != mailFolder.size();i++){
         tools.splitString(mailFolder[i],split,".");
-        if(split[1] == "new"){
+        if(split[1] == "new"||split[1]=="NEW"){
             amount++;
         }
     }
+    if(verbose){
     serial.write("You have ");
     if(amount>0){
         serial.write(std::to_string(amount));
@@ -35,6 +43,8 @@ void e_mail::getNewMail(){
     } else {
         serial.print("");
     }
+    }
+    return amount;
 }
 
 void e_mail::help(){
@@ -51,20 +61,32 @@ void e_mail::mail_sort(){
     std::string mailInfo[1];
     std::vector<std::string> tempFolder;
     int sortDate[1024][2];
-    std::string dateStr[2];
+    std::string dateStr[5];
     int date[2];
     int dateInt;
     int sortedDate[1024][2];
 
-    for(std::vector<int>::size_type i = 2; i != mailFolder.size();i++){
+    for(int i = 2; i != mailFolder.size();i++){
         mailInfoTemp = fstools.file_getLine(path+mailFolder[i],0);
         tools.splitString(mailInfoTemp,mailInfo,"|");
-        tools.splitString(mailInfo[1],dateStr,"/");
-        dateInt = tools.dateToInt(date[0],date[1],date[2]);
-        printf("DateInt = %d\n",dateInt);
+        tools.splitString(mailInfo[1],dateStr,"/- :");
+
+        printf("\nDATE IN SEQUENCE\n");
+        printf("\n%s",dateStr[0].c_str());
+        printf("\n%s",dateStr[1].c_str());
+        printf("\n%s",dateStr[2].c_str());
+        printf("\n%s",dateStr[3].c_str());
+        printf("\n%s",dateStr[4].c_str());
+
+        ///dateInt = tools.dateToInt(date[0],date[1],date[2]);
+
+        dateInt = tools.dateToInt(atoi(dateStr[2].c_str()),atoi(dateStr[1].c_str()),atoi(dateStr[0].c_str()),atoi(dateStr[3].c_str()),atoi(dateStr[4].c_str()));
+        //printf("DateInt = %d\n",dateInt);
         sortDate[i][0]=i;
         sortDate[i][1]=dateInt;
+        printf("\nPresort vector entry: %i | %i",sortDate[i][0],sortDate[i][1]);
     }
+    return;
     //std::sort(std::begin(sortDate[1]), std::end(sortDate[1]), this->compareArray);
 
 
@@ -189,7 +211,7 @@ int e_mail::inbox_drawMail(int index, int page){
     serial.write(defColor);
     for(std::vector<int>::size_type i = 0; i != mailFolder.size();i++){
         tools.splitString(mailFolder[i].c_str(),split,".");
-        if(split[1]=="new"||split[1]=="old"){
+        if(split[1]=="new"||split[1]=="old"||split[1]=="NEW"||split[1]=="OLD"){
             if(indexOffset==i){
                 serial.write(" ¯ \e[7m");
             } else {
@@ -276,7 +298,7 @@ void e_mail::inbox(){
                ///11111111111111111111111111111111111111112222222222222222222222222222222222222222   80-Columns
     serial.print(" Ä INBOX ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ");
     amount = this->inbox_drawMail(index,page);
-    serial.write("\e[7m\e[K Arrow keys = Select mail | Enter = Open | E = Exit\e[0m");
+    serial.write("\e[7m\e[K Arrow keys = Select mail | Enter = Open | E = Exit | R = Refresh | S = Sort\e[0m");
     serial.write(defColor);
 
     while(true){
@@ -296,12 +318,23 @@ void e_mail::inbox(){
             this->inbox_openMail(index);
             this->inbox_clearWindow();
             this->inbox_drawMail(index,page);
-            serial.write("\e[7m\e[K Arrow keys = Select mail | Enter = Open | E = Exit\e[0m");
+            serial.write("\e[7m\e[K Arrow keys = Select mail | Enter = Open | E = Exit | R = Refresh\e[0m");
             serial.write(defColor);
         } else if(key=="e"){
             serial.write("\e[2J\e[0;0H");
             break;
+        } else if(key=="r"){
+            this->inbox_clearWindow();
+            this->refreshMailFolder();
+            amount = this->inbox_drawMail(index,page);
+        } else if(key=="s"){
+            this->mail_sort();
+            this->inbox_clearWindow();
+            this->refreshMailFolder();
+            amount = this->inbox_drawMail(index,page);
         };
+
+
     }
     serial.write("\e[2J\e[0m"+defColor);
 }

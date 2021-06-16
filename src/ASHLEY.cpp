@@ -10,6 +10,46 @@ ASHLEY::~ASHLEY()
     //dtor
 }
 
+int ASHLEY::ashleyBoot(){
+    int timer =(rand() % 10) + 1; ///Random Generator
+    timer = 11; ///Uncomment if timeout
+
+
+    serial.write("\e[0m\e[1;32m\e[40m\e[2J\e[0;0H");
+    serial.getKey();
+    serial.write("\e[12B                        Accessing networking subsystem");
+    Sleep(1537);
+    serial.write("\e[80D                           Establishing connection      ");
+    for(int i=0; i<=10; i++){
+        if(i%4==0){
+            serial.write("\e[6D      \e[6D");
+        } else {
+            serial.write(" .");
+        }
+        Sleep(1000);
+        if(i==timer){
+            return 0;
+        };
+    }
+    serial.write("\a\r\n              Error establishing connection - connection timed out");
+    serial.getKey();
+    serial.print("\r\n\r\n  - MANUAL CONTROL MODE ENABLED - ");
+    while(true){
+        serial.write("@>");
+        std::string cmd_temp=serial.readLine(0);
+        if(cmd_temp=="disconnect"){
+            for(int i=0; i<=25; i++){
+                serial.print("");
+            }
+            serial.write("\e[2J");
+            return 1;
+        }
+        Sleep(10);
+        cmd_temp="";
+    }
+}
+
+
 std::string ASHLEY::waitForKey(){
     std::string ret = serial.getKey();
     running=false;

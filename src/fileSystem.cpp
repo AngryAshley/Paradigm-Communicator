@@ -170,29 +170,21 @@ int fileSystem::DeleteDirectory(const std::string &refcstrRootDirectory, bool bD
 
   strPattern = refcstrRootDirectory + "\\*.*";
   hFile = ::FindFirstFile(strPattern.c_str(), &FileInformation);
-  if(hFile != INVALID_HANDLE_VALUE)
-  {
-    do
-    {
-      if(FileInformation.cFileName[0] != '.')
-      {
+  if(hFile != INVALID_HANDLE_VALUE){
+    do{
+      if(FileInformation.cFileName[0] != '.'){
         strFilePath.erase();
         strFilePath = refcstrRootDirectory + "\\" + FileInformation.cFileName;
 
-        if(FileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-        {
-          if(bDeleteSubdirectories)
-          {
+        if(FileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+          if(bDeleteSubdirectories){
             // Delete subdirectory
             int iRC = DeleteDirectory(strFilePath, bDeleteSubdirectories);
             if(iRC)
               return iRC;
-          }
-          else
+          }else
             bSubdirectory = true;
-        }
-        else
-        {
+        }else{
           // Set file attributes
           if(::SetFileAttributes(strFilePath.c_str(),
                                  FILE_ATTRIBUTE_NORMAL) == FALSE)
@@ -211,10 +203,8 @@ int fileSystem::DeleteDirectory(const std::string &refcstrRootDirectory, bool bD
     DWORD dwError = ::GetLastError();
     if(dwError != ERROR_NO_MORE_FILES)
       return dwError;
-    else
-    {
-      if(!bSubdirectory)
-      {
+    else{
+      if(!bSubdirectory){
         // Set directory attributes
         if(::SetFileAttributes(refcstrRootDirectory.c_str(),
                                FILE_ATTRIBUTE_NORMAL) == FALSE)
@@ -226,7 +216,6 @@ int fileSystem::DeleteDirectory(const std::string &refcstrRootDirectory, bool bD
       }
     }
   }
-
   return 0;
 }
 int fileSystem::fileEditor_drawMenu(int mode, int select1, int select2){
@@ -358,7 +347,7 @@ int fileSystem::fileEditor(std::string path){
                 while(inMenu){
                     this->fileEditor_drawMenu(1,sel1,sel2);
                     std::string key = serial.getKey();
-                    printf("%s",key);
+                    printf("%s",key.c_str());
                     if(key.std::string::size()>1 || key=="\x0d" || key=="\x08"||key=="\x1b"){
                         if(key=="\e[A"){   ///keys in sequence UP DOWN RIGHT LEFT
                             if(sel2!=0){sel2--;}
@@ -401,4 +390,5 @@ int fileSystem::fileEditor(std::string path){
         }
         serial.write("\e["+std::to_string(curLine+3)+";0H"+currentLine);
     }
+    return 255;
 }

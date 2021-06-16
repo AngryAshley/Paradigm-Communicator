@@ -36,6 +36,7 @@
 		</Compiler>
 		<Unit filename="include/ASHLEY.h" />
 		<Unit filename="include/FileSystemTools.h" />
+		<Unit filename="include/SAS.h" />
 		<Unit filename="include/Serial.h" />
 		<Unit filename="include/cpipe.h" />
 		<Unit filename="include/e-mail.h" />
@@ -48,6 +49,7 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="src/ASHLEY.cpp" />
 		<Unit filename="src/FileSystemTools.cpp" />
+		<Unit filename="src/SAS.cpp" />
 		<Unit filename="src/Serial.cpp" />
 		<Unit filename="src/e-mail.cpp" />
 		<Unit filename="src/fileSystem.cpp" />

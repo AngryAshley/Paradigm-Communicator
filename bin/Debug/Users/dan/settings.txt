@@ -1,2 +1,3 @@
 password=the man
-authLevel=8
+authLevel=2
+archival=0

@@ -1,5 +1,5 @@
 sys_os=win
-ser_port=3
+ser_port=4
 msg_MOTD=
 AshleyMode=0
 

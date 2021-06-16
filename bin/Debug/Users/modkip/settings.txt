@@ -1,2 +1,4 @@
 password=hallo
-authLevel=9
+authLevel=2
+archival=0
+

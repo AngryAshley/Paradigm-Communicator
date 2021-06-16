@@ -39,13 +39,10 @@ std::string Tools::setting_read(std::string setting, std::string path){
     return "FILE_NOT_FOUND";
 }
 
-
 void Tools::splitString(std::string temp, std::string output[], char* tokens){
-    //printf("Splitstring Called");
     int s=0;
     char str[255];
     strcpy(str, temp.c_str());
-    //printf(" - copy successful\n");
     char * pch;
     pch = strtok (str,tokens);
     while (pch != NULL){
@@ -69,12 +66,18 @@ std::string Tools::date(){
     return dt;
 }
 
-int Tools::dateToInt(int day, int month, int year){
-    return year*10000 + month*100 + day;
+int Tools::dateToInt(int day, int month, int year, int hour, int minute){
+    char* temp;
+    std::sprintf(temp,"%i%i%i%i%i",year,month,day,hour,minute);
+    printf("formatted date: %s", temp);
+    return atoi(temp);
 }
 
-bool Tools::compareArray( const std::array<int, 2>& u, const std::array<int, 2>& v ){
+bool Tools::compareArray(const std::array<int, 2>& u, const std::array<int, 2>& v ){
     return u[1] < v[1];
 };
 
+int Tools::throwError(int type, std::string info, int severity){
+
+}
 

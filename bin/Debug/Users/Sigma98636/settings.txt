@@ -1,2 +1,3 @@
 password=z8CjKZLA
 authLevel=5
+archival=0

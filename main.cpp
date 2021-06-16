@@ -12,6 +12,7 @@
 #include <fileSystem.h>
 #include <users.h>
 #include <ASHLEY.h>
+#include <SAS.h>
 
 
 
@@ -23,17 +24,19 @@ char incomingData[MAX_DATA_LENGTH];
 int serialBaud = 6.666666;
 string PCS_ver="0.1.0 A";
 string path_exe="";
-bool ASHLEYmode=false;
+bool ASHLEYmode=true;
 
 typedef vector<string> strvec;
 
 /// System initialization ///
 SerialPort serial;
+serialTools stools;
 Tools tools;
 e_mail mail;
 fileSystem fs;
 Users users;
 ASHLEY ashley;
+SAS Sas;
 
 /// User-end variables ///
 int sys_comNum=4;
@@ -95,6 +98,9 @@ void loadSettings(){
 int CLI(){
     fill_n(cmd, 8, "");
 
+    if(atoi(tools.setting_read("archival", "\\Users\\"+uname+"\\settings.txt").c_str())>0){if(Sas.check(false)>0)Sas.check();}
+    if(mail.getNewMail(false)>0){mail.getNewMail();}
+
     temppath=fs.cd;
     if(temppath.size()>=homefolder.size()){
         temppath.erase(0, homefolder.size());
@@ -107,15 +113,9 @@ int CLI(){
 
     if(cmd[0] == "VER"){
         serial.print("Paradigm communicator "+PCS_ver);
-
     } else if(cmd[0]=="EXIT") {
-        serial.print("Logging off... Bye!"); ///AT-command to disconnect modem
-        Sleep(1000);
-        serial.write("+++");
-        Sleep(1010);                         ///wait 1 second at very least
-        serial.write("ATH0\r");
+        stools.closeConn("Logging off... Bye!");
         return 0;
-
 
     } else if(cmd[0]=="BEEP"){
         serial.print("\a");
@@ -131,8 +131,9 @@ int CLI(){
         } else if(cmd[1]=="INBOX"||cmd[1]==""){
             mail.inbox();
         } else {
-            serial.print("Bad parameter - "+cmd[1]);
+            stools.throwError(0,cmd[1]);
         }
+
     } else if(cmd[0]=="LOGOFF"){
         serial.print("Logging off, bye!");
         uname = "";
@@ -152,8 +153,8 @@ int CLI(){
     } else if(cmd[0]=="CD"){
         printf("%s",cmd[1].c_str());
         if(cmd[1]==".."){
-            if(fs.cd == homefolder && users.auth(uname)<=9){
-                serial.print("Access denied");
+            if(fs.cd == homefolder && users.auth(uname)>=9){
+                stools.throwError(11);
             } else {
                 fs.changeDir(cmd[1]);
             }
@@ -162,12 +163,11 @@ int CLI(){
             fs.changeDir(cmd[1]);
         }
 
-
     } else if(cmd[0]=="PRINT"){
         if(fs.fileExists(fs.cd+cmd[1])){
             fs.printBigFile(fs.cd+cmd[1]);
         } else {
-            serial.write("File "+cmd[1]+" not found");
+            stools.throwError(20,cmd[1]);
         }
     } else if(cmd[0]=="HELP"){
         fs.printBigFile(string(path_exe)+string("\\Settings\\help.txt"));
@@ -180,20 +180,39 @@ int CLI(){
     } else if(cmd[0]=="USER"){
         cmd[1]=tools.to_upper(cmd[1]);
         if(cmd[1]=="CREATE"){
-            if(users.auth(uname)>7){
+            if(users.auth(uname)<3){
                 users.makeUser();
             } else {
-                serial.print("Permission denied");
+                stools.throwError(10);
             }
         } else if(cmd[1]=="PURGE"){
-            if(users.auth(uname)>7){
+            if(users.auth(uname)<3){
                 users.purgeUser();
             } else {
-                serial.print("Permission denied");
+                stools.throwError(10);
             }
         } else {
-            serial.print("Bad parameter - "+cmd[1]+"\r\n");
+            stools.throwError(0,cmd[1]);
         }
+    } else if(cmd[0]=="SAS"||cmd[0]=="ARCHIVE"){
+        cmd[1]=tools.to_upper(cmd[1]);
+        if(cmd[1]==""){
+            Sas.menu(users.auth(uname),atoi(tools.setting_read("archival", "\\Users\\"+uname+"\\settings.txt").c_str()),uname);
+        } else if(cmd[1]=="INBOX"){
+            if(atoi(tools.setting_read("archival", "\\Users\\"+uname+"\\settings.txt").c_str())>0){
+                printf("calling inbox");
+                Sas.inbox();
+            } else {
+                stools.throwError(12,"only archive personnel is allowed to access the inbox.");
+            }
+        } else if(cmd[1]=="CHECK"){
+            if(atoi(tools.setting_read("archival", "\\Users\\"+uname+"\\settings.txt").c_str())>0){
+                Sas.check();
+            } else {
+                stools.throwError(12,"only archive personnel is allowed to access the inbox.");
+            }
+        }
+
     } else if(cmd[0]=="EDIT"){
         fs.fileEditor(cmd[1]);
     } else if(cmd[0]=="HWOOD"){
@@ -213,11 +232,11 @@ int CLI(){
             serial.getKey();
             serial.write("\e[0m"+misc_defColor+"\e[2J");
         } else {
-        serial.print("No hollywood scene found for "+cmd[1]);
+            stools.throwError(255,"No hollywood scene found for "+cmd[1]);
         }
 
     } else {
-        serial.write("Bad command - "+cmd[0]+"\r\n");
+        stools.throwError(1,cmd[0]);
     };
 
 
@@ -236,10 +255,13 @@ void login_finalize(){
     fs.read_dir_vect(path,folder);
     mail.mailFolder = folder;
     mail.path = path;
-    mail.getNewMail();
     mail.defColor = misc_defColor;
     fs.defColor = misc_defColor;
     fs.cd = homefolder;
+
+    if(mail.getNewMail(false)<0){mail.getNewMail();}
+    mail.getNewMail();
+
 }
 
 int login(){
@@ -247,11 +269,7 @@ int login(){
     serial.write("Username: ");
     uname=serial.readLine(0);
     if(uname=="exit"){
-        serial.print("Closing connection..."); ///AT-command to disconnect modem
-        Sleep(1000);
-        serial.write("+++");
-        Sleep(1010);                         ///wait 1 second at very least
-        serial.write("ATH0\r");
+        stools.closeConn("Closing connection...");
         return 0;
     }
     serial.write("Password: ");
@@ -267,44 +285,6 @@ int login(){
     return ret;
 }
 
-int ashleyBoot(){
-    int timer =(rand() % 10) + 1; ///Random Generator
-    timer = 11; ///Uncomment if timeout
-
-
-    serial.write("\e[0m"+misc_color+"\e[2J\e[0;0H");
-    serial.getKey();
-    serial.write("\e[12B                        Accessing networking subsystem");
-    Sleep(1537);
-    serial.write("\e[80D                           Establishing connection      ");
-    for(int i=0; i<=10; i++){
-        if(i%4==0){
-            serial.write("\e[6D      \e[6D");
-        } else {
-            serial.write(" .");
-        }
-        Sleep(1000);
-        if(i==timer){
-            return 0;
-        };
-    }
-    serial.write("\a\r\n              Error establishing connection - connection timed out");
-    serial.getKey();
-    serial.print("\r\n\r\n  - MANUAL CONTROL MODE ENABLED - ");
-    while(true){
-        serial.write("@>");
-        cmd_temp=serial.readLine(0);
-        if(cmd_temp=="disconnect"){
-            for(int i=0; i<=25; i++){
-                serial.print("");
-            }
-            serial.write("\e[2J");
-            return 1;
-        }
-        Sleep(10);
-        cmd_temp="";
-    }
-}
 
 void loginPrompt(){
     serial.write("\e[0m"+misc_color+"\e[2J\e[0;0H");
@@ -338,18 +318,27 @@ int main(){
     printf("Establishing connection with %s... ",port_name.c_str());
     serial.connect(port_name);
     printf("OK\n");
+        stools.serial = serial;
         mail.serial = serial;
+        mail.fs = fs;
         fs.serial = serial;
         users.serial = serial;
         users.tools = tools;
         users.fs = fs;
         ashley.serial = serial;
         ashley.tools = tools;
+        Sas.fs = fs;
+        Sas.tools = tools;
+        Sas.serial = serial;
+        Sas.sTools = stools;
+        Sas.path_exe=path_exe;
 
     if(ASHLEYmode){
-        if(ashleyBoot()!=0){
+        if(ashley.ashleyBoot()!=0){
             return 0;
-        };
+        }
+    } else {
+        printf("ASH disabled\n");
     }
     loginPrompt();
 

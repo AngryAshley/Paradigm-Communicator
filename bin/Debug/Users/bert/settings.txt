@@ -1,2 +1,3 @@
 password=ballen
-authLevel=4
+authLevel=6
+archival=0
