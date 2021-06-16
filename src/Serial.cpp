@@ -29,7 +29,11 @@ SerialPort::connect(std::string portName){
         if (!GetCommState(this->handler, &dcbSerialParameters)) {
             printf("failed to get current serial parameters");
         } else {
+<<<<<<< HEAD
             dcbSerialParameters.BaudRate = CBR_2400;
+=======
+            dcbSerialParameters.BaudRate = CBR_57600;
+>>>>>>> 3d122d48f90d23c1751ee1c31217880a8e57b2ce
             dcbSerialParameters.ByteSize = 8;
             dcbSerialParameters.StopBits = ONESTOPBIT;
             dcbSerialParameters.Parity = NOPARITY;

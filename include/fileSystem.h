@@ -19,6 +19,7 @@ class fileSystem
         SerialPort serial;
         FileSystemTools fst;
         serialTools stools;
+        Tools tools;
 
         void showDir();
         void changeDir(std::string dir);
@@ -30,6 +31,7 @@ class fileSystem
         int DeleteDirectory(const std::string &refcstrRootDirectory, bool bDeleteSubdirectories = true);
         void hideFile(const std::string& fileName);
 
+        void db(std::string dbID, int clearance);
         int fileEditor(std::string path);
 
         std::string defColor;

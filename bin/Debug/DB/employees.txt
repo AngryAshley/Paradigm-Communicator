@@ -1,0 +1,13 @@
+#CLEVEL.7|ID.7|NAME.13|FORE.5|SEX.3|LV.2|CLASS.6|FUNCTION.12|DOMAIN.12|DEPTS.16
+T-08641|Reynolds|N.|M|8|Veil|Assistant|Electronics|HAV
+F-13851|Hopkins|P.|F|6|Veil|Researcher|Biology|SBR, HAV
+B-42549|Flynn|R.|F|6|Top|Researcher|Biology|SBR, SSPA
+D-69247|Walker|G.|M|7|Top|Engineer|Electronics|SSPA
+S-98636|0004882592|FAAJR|M|7|Top|Assistant|Electronics|SSPA
+I-52351|Sheppard|C.|M|4|Top|Researcher|Psychology|SSPA
+F-66191|Howard|F.|M|7|Veil|HR Manager|Management|HAV
+U-38211|Fowler|J.|M|4|Veil|Researcher|Biology|HAV
+
+
+
+
