@@ -13,6 +13,7 @@
 #include <users.h>
 #include <ASHLEY.h>
 #include <SAS.h>
+#include "ParaChess.h"
 
 
 
@@ -42,6 +43,7 @@ fileSystem fs;
 Users users;
 ASHLEY ashley;
 SAS Sas;
+ParaChess pchess;
 
 /// User-end variables ///
 int sys_comNum=4;
@@ -98,7 +100,7 @@ void loadSettings(){
 
 
 
-///================================================================================================== CLI block ================================\\\
+//================================================================================================== CLI block ================================\\\
 
 int CLI(){
     fill_n(cmd, 8, "");
@@ -246,6 +248,8 @@ int CLI(){
         } else {
             serial.print("Please specify database");
         }
+    } else if(cmd[0]=="CHESS"){
+        pchess.debug();
     } else {
         stools.throwError(1,cmd[0]);
     };
@@ -257,7 +261,7 @@ int CLI(){
     return 255; //something went horribly wrong
 }
 
-///================================================================================================== Login block ================================\\\
+//================================================================================================== Login block ================================\\\
 
 void login_finalize(){
     homefolder = string(path_exe)+string("Users\\")+string(uname)+string("\\");
@@ -350,6 +354,7 @@ int main(){
         Sas.serial = serial;
         Sas.sTools = stools;
         Sas.path_exe=path_exe;
+        pchess.serial = serial;
 
     if(ASHLEYmode){
         if(ashley.ashleyBoot()!=0){
